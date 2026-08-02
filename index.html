@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#fafaf7">
+<title>存好管家</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#fafaf7;--card:#fff;--text:#2c2c2c;--sub:#8a8a8a;--border:#ececea;--accent:#f5a04e;--green:#6cc28b;--red:#e57b85;--blue:#7ba7d9;--yellow:#e9c465;--pink:#d99fb0;--shadow:0 1px 3px rgba(0,0,0,.04),0 4px 12px rgba(0,0,0,.03)}
+html,body{height:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.app{display:flex;min-height:100vh;max-width:480px;margin:0 auto;background:var(--bg)}
+.sidebar{width:84px;background:#f0efe8;display:flex;flex-direction:column;align-items:center;padding:20px 0;gap:18px;flex-shrink:0}
+.logo{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#7fb88b,#5a9968);display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff;margin-bottom:6px}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border-radius:10px;cursor:pointer;width:64px;transition:all .2s}
+.nav-item:hover{background:rgba(0,0,0,.04)}
+.nav-item.active{background:#fff;box-shadow:var(--shadow)}
+.nav-icon{font-size:24px;line-height:1}
+.nav-label{font-size:11px;color:#666}
+.nav-item.active .nav-label{color:var(--text);font-weight:600}
+.main{flex:1;padding:18px 16px;overflow-y:auto}
+.page{display:none}
+.page.active{display:block}
+.page-title{font-size:24px;font-weight:700;color:#5a9968;margin-bottom:4px;letter-spacing:1px}
+.page-date{font-size:12px;color:var(--sub);margin-bottom:14px}
+.btn-row{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.btn{flex:1;min-width:0;padding:10px 14px;border-radius:22px;border:none;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;background:#fff;color:var(--text);box-shadow:var(--shadow);transition:transform .15s}
+.btn:hover{transform:translateY(-1px)}
+.btn-add{background:var(--green);color:#fff;border-radius:50px;padding:14px 24px;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;border:none;flex:1;box-shadow:var(--shadow)}
+.btn-add-2{background:#fff;color:var(--text);border-radius:50px;padding:14px 24px;font-size:14px;cursor:pointer;border:1px solid var(--border);flex:1}
+.card{background:var(--card);border-radius:18px;padding:18px;box-shadow:var(--shadow);margin-bottom:14px}
+.card-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.card-mini{background:var(--card);border-radius:18px;padding:16px;box-shadow:var(--shadow)}
+.tag{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;margin-right:4px}
+.tag-blue{background:#e8f0f8;color:#5a87b4}
+.tag-orange{background:#fcebd9;color:#cc7a3a}
+.tag-green{background:#dff0e3;color:#4a885f}
+.tag-pink{background:#fae3e8;color:#b9607a}
+.card-label{font-size:12px;color:var(--sub);margin-bottom:6px;font-weight:500}
+.card-big{font-size:26px;font-weight:700;letter-spacing:-.5px}
+.card-big.small{font-size:20px}
+.card-sub{font-size:11px;color:var(--sub);margin-top:4px}
+.progress{height:6px;background:#f0eee8;border-radius:3px;overflow:hidden;margin-top:8px}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),#d88545);border-radius:3px;transition:width .4s}
+.section-title{font-size:14px;font-weight:600;margin:8px 0 10px;display:flex;align-items:center;gap:6px}
+.section-title::before{content:"";width:3px;height:14px;background:var(--accent);border-radius:2px}
+.record{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #f4f4f0}
+.record:last-child{border-bottom:none}
+.record-left{display:flex;align-items:center;gap:10px}
+.record-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;background:#faf5ed}
+.record-info .r1{font-size:13px;font-weight:500}
+.record-info .r2{font-size:11px;color:var(--sub);margin-top:2px}
+.record-amt{font-size:14px;font-weight:600}
+.record-amt.pos{color:var(--green)}
+.record-amt.neg{color:var(--red)}
+.record-del{margin-left:8px;width:22px;height:22px;border-radius:50%;background:#f0eee8;color:#aaa;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px}
+.form-add{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;align-items:center}
+.input{flex:1;min-width:0;padding:10px 14px;border:1px solid var(--border);border-radius:22px;background:#fff;font-size:13px;outline:none;font-family:inherit;color:var(--text)}
+.input:focus{border-color:var(--accent)}
+.select{padding:10px 30px 10px 14px;border:1px sol
