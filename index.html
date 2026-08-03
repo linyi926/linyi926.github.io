@@ -4,15 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#fafaf7">
-<title>林意'管家</title>
+<title>林意｜管家</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--bg:#fafaf7;--card:#fff;--text:#2c2c2c;--sub:#8a8a8a;--border:#ececea;--accent:#f5a04e;--green:#6cc28b;--red:#e57b85;--blue:#7ba7d9;--yellow:#e9c465;--pink:#d99fb0;--shadow:0 1px 3px rgba(0,0,0,.04),0 4px 12px rgba(0,0,0,.03)}
 html,body{height:100%}
 body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
-.app{display:flex;min-height:100vh;max-width:480px;margin:0 auto;background:var(--bg)}
-.sidebar{width:72px;background:#f0efe8;display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:12px;flex-shrink:0}
+.app{display:flex;min-height:100vh;width:100%;max-width:480px;margin:0 auto;background:var(--bg);overflow-x:hidden;box-sizing:border-box}
+.sidebar{width:64px;background:#f0efe8;display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:12px;flex-shrink:0}
 .logo{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#7fb88b,#5a9968);display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;margin-bottom:4px}
 .nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px;border-radius:8px;cursor:pointer;width:56px;transition:all .2s}
 .nav-item:hover{background:rgba(0,0,0,.04)}
@@ -20,7 +20,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 .nav-icon{font-size:20px;line-height:1}
 .nav-label{font-size:10px;color:#666}
 .nav-item.active .nav-label{color:var(--text);font-weight:600}
-.main{flex:1;padding:12px 12px;overflow-y:auto}
+.main{flex:1;padding:12px 10px;overflow-y:auto;overflow-x:hidden;min-width:0;width:100%;box-sizing:border-box}
 .page{display:none}
 .page.active{display:block}
 .page-title{font-size:19px;font-weight:700;color:#5a9968;margin-bottom:2px;letter-spacing:.5px}
@@ -30,7 +30,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 .btn:hover{transform:translateY(-1px)}
 .btn-add{background:var(--green);color:#fff;border-radius:50px;padding:10px 20px;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:5px;cursor:pointer;border:none;flex:1;box-shadow:var(--shadow)}
 .btn-add-2{background:#fff;color:var(--text);border-radius:50px;padding:10px 20px;font-size:13px;cursor:pointer;border:1px solid var(--border);flex:1}
-.card{background:var(--card);border-radius:14px;padding:12px;box-shadow:var(--shadow);margin-bottom:8px}
+.card{background:var(--card);border-radius:14px;padding:10px;box-shadow:var(--shadow);margin-bottom:8px}
+.debt-group-card{background:var(--card);border-radius:10px;padding:6px 8px;box-shadow:var(--shadow);margin-bottom:5px}
+.debt-group-card .row1{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px}
+.debt-group-card .name{font-weight:600;font-size:13px}
+.debt-group-card .remain{font-size:13px;font-weight:700;color:var(--red)}
+.debt-group-card .remain-sub{font-size:8px;color:var(--sub);text-align:right;margin-top:-2px}
+.debt-group-card .row2{display:flex;justify-content:space-between;font-size:9px;color:var(--sub);margin-bottom:2px}
+.debt-group-card .progress{margin-top:2px!important;height:3px!important}
+.debt-group-card .pay-btn{margin-top:3px;padding:3px!important;font-size:10px!important}
 .card-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
 .card-mini{background:var(--card);border-radius:14px;padding:11px;box-shadow:var(--shadow)}
 .tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;margin-right:3px}
@@ -38,7 +46,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 .tag-orange{background:#fcebd9;color:#cc7a3a}
 .tag-green{background:#dff0e3;color:#4a885f}
 .tag-pink{background:#fae3e8;color:#b9607a}
-.card-label{font-size:11px;color:var(--sub);margin-bottom:4px;font-weight:500}
+.card-label{font-size:10px;color:var(--sub);margin-bottom:3px;font-weight:500}
 .card-big{font-size:19px;font-weight:700;letter-spacing:-.5px}
 .card-big.small{font-size:15px}
 .card-sub{font-size:10px;color:var(--sub);margin-top:3px}
@@ -46,18 +54,22 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),#d88545);border-radius:3px;transition:width .4s}
 .section-title{font-size:13px;font-weight:600;margin:4px 0 6px;display:flex;align-items:center;gap:5px}
 .section-title::before{content:"";width:3px;height:12px;background:var(--accent);border-radius:2px}
-.record{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f4f4f0}
+.record{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f4f4f0;width:100%!important;max-width:100vw;min-width:0;box-sizing:border-box;flex-wrap:nowrap;gap:4px}
+.record>*{min-width:0;flex-shrink:1}
+.record-info{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.record-icon{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;background:#faf5ed;flex-shrink:0}
+.record-info .r1{font-size:11px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.record-info .r2{font-size:9px;color:var(--sub);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.record-amt{font-size:12px;font-weight:600;flex-shrink:0}
+.record-del{margin-left:4px;width:18px;height:18px;border-radius:50%;background:#f0eee8;color:#aaa;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+#bk-list,#st-list,#sv-list,#dt-list{display:flex;flex-direction:column;width:100%;max-width:100vw;overflow:hidden}
+#bk-list>*,#st-list>*,#sv-list>*,#dt-list>*{display:flex!important;width:100%!important;max-width:100%!important;flex-shrink:0}
 .record:last-child{border-bottom:none}
-.record-left{display:flex;align-items:center;gap:8px}
-.record-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;background:#faf5ed}
-.record-info .r1{font-size:12px;font-weight:500}
-.record-info .r2{font-size:10px;color:var(--sub);margin-top:1px}
-.record-amt{font-size:13px;font-weight:600}
+.record-left{display:flex;align-items:center;gap:8px;min-width:0;flex:1;overflow:hidden}
 .record-amt.pos{color:var(--green)}
 .record-amt.neg{color:var(--red)}
-.record-del{margin-left:6px;width:20px;height:20px;border-radius:50%;background:#f0eee8;color:#aaa;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px}
 .form-add{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;align-items:center}
-.input{flex:1;min-width:0;padding:8px 12px;border:1px solid var(--border);border-radius:18px;background:#fff;font-size:12px;outline:none;font-family:inherit;color:var(--text)}
+.input{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:18px;background:#fff;font-size:12px;outline:none;font-family:inherit;color:var(--text);box-sizing:border-box}
 .input:focus{border-color:var(--accent)}
 .select{padding:8px 26px 8px 12px;border:1px solid var(--border);border-radius:18px;background:#fff;font-size:12px;outline:none;appearance:none;-webkit-appearance:none;cursor:pointer;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%23888' d='M0 0l5 6 5-6z'/></svg>");background-repeat:no-repeat;background-position:right 10px center;font-family:inherit;color:var(--text)}
 .pie-card{text-align:center}
@@ -72,16 +84,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 .modal{background:#fff;border-radius:16px;padding:18px;width:100%;max-width:360px;max-height:85vh;overflow-y:auto}
 .modal-title{font-size:16px;font-weight:700;margin-bottom:12px}
 .form-group{margin-bottom:10px}
-.form-label{font-size:11px;color:var(--sub);margin-bottom:4px;display:block}
+.form-label{font-size:10px;color:var(--sub);margin-bottom:3px;display:block}
 .form-input,.form-select{width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:8px;font-size:13px;outline:none;font-family:inherit;background:#fff;color:var(--text)}
 .form-input:focus,.form-select:focus{border-color:var(--accent)}
 .modal-actions{display:flex;gap:8px;margin-top:14px;justify-content:flex-end}
-.btn-cancel{padding:8px 20px;border-radius:18px;background:#f0eee8;border:none;cursor:pointer;font-size:13px}
+.btn-cancel{padding:8px 20px;border-radius:18px;background:#f0efe8;border:none;cursor:pointer;font-size:13px}
 .btn-ok{padding:8px 20px;border-radius:18px;background:var(--text);color:#fff;border:none;cursor:pointer;font-size:13px}
 .empty{text-align:center;color:var(--sub);padding:20px 0;font-size:12px}
 .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.8);color:#fff;padding:10px 20px;border-radius:22px;font-size:13px;z-index:200;opacity:0;transition:opacity .3s;pointer-events:none}
 .toast.show{opacity:1}
 .goal-card{background:linear-gradient(135deg,#fff5e6,#fff);border:1px solid #fcebd9}
+
 /* Login screen */
 .login-mask{position:fixed;inset:0;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;z-index:999;padding:20px}
 .login-box{background:#fff;border-radius:24px;padding:32px 28px;width:100%;max-width:340px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.2)}
@@ -93,6 +106,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 .login-btn{width:100%;padding:14px;background:var(--text);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit}
 .login-btn:hover{background:#1a1a1a}
 .login-hint{font-size:11px;color:var(--sub);margin-top:16px}
+
 /* Sync status */
 .sync-status{position:fixed;top:10px;right:10px;display:flex;align-items:center;gap:6px;padding:6px 12px;background:rgba(255,255,255,.9);border-radius:20px;font-size:11px;color:var(--sub);box-shadow:var(--shadow);z-index:50;backdrop-filter:blur(10px)}
 .sync-dot{width:8px;height:8px;border-radius:50%;background:var(--green)}
@@ -106,16 +120,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 <div class="login-mask" id="login">
   <div class="login-box">
     <div class="login-logo">🌱</div>
-    <div class="login-title">林意'管家</div>
+    <div class="login-title">林意｜管家</div>
     <div class="login-sub">请输入访问密码</div>
     <input type="password" class="login-input" id="pwd-input" placeholder="••••" inputmode="numeric" maxlength="20">
     <button class="login-btn" onclick="checkPwd()">进入</button>
     <div class="login-hint">数据云端同步 · 多设备访问</div>
   </div>
 </div>
+
 <!-- Main app -->
 <div class="app" id="app" style="display:none">
   <div class="sync-status"><div class="sync-dot" id="sync-dot"></div><span id="sync-text">已同步</span></div>
+
 <div class="sidebar">
 <div class="logo">🌱</div>
 <div class="nav-item active" data-page="bookkeeping"><div class="nav-icon">📒</div><div class="nav-label">记账</div></div>
@@ -138,9 +154,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 </div>
 <div class="card"><div style="font-weight:600;margin-bottom:10px">本月预算使用情况</div><div class="progress"><div class="progress-fill" id="bk-progress" style="width:0%"></div></div><div style="display:flex;justify-content:space-between;margin-top:8px;font-size:12px;color:var(--sub)"><span>已花 <b style="color:var(--text)" id="bk-month-spent">0</b> 元</span><span>剩余 <b style="color:var(--text)" id="bk-month-left">0</b> 元</span></div></div>
 <div class="section-title">本月花费记录</div>
-<div style="display:flex;flex-direction:column;gap:8px;margin-top:10px"><select class="select" id="bk-cat"><option>🍜 餐饮</option><option>🚇 交通</option><option>🛒 购物</option><option>💊 医疗</option><option>🎮 娱乐</option><option>📚 学习</option><option>🏠 居家</option><option>💼 其他</option></select><input type="date" class="input" id="bk-date-input"><input type="text" class="input" id="bk-note" placeholder="备注"><input type="number" class="input" id="bk-amt" placeholder="金额"></div>
-<div style="display:flex;justify-content:flex-end;margin-top:10px"><button class="btn-add-2" onclick="addExpense()">添加</button></div>
-<div id="bk-list" style="margin-top:8px"></div>
+<div style="display:flex;justify-content:flex-end;margin-top:10px"><button class="btn-add-2" onclick="openAddExpenseModal()">添加</button></div>
+<div id="bk-list" style="margin-top:8px;display:flex;flex-direction:column;width:100%"></div>
 </div>
 <div class="page" id="page-stall">
 <div class="page-title">你好摆摊</div>
@@ -152,10 +167,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 <div class="card" style="background:linear-gradient(135deg,#fce4d2,#fbe2c8)"><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:600">本月总收入</div><div style="font-size:11px;color:#a06a3e;margin-top:4px" id="st-percent-detail">线上 0% · 线下 0%</div></div><div style="font-size:24px;font-weight:700;color:#7a4a25" id="st-total">0.00 元</div></div></div>
 <div class="card pie-card"><div style="font-weight:600;margin-bottom:10px;text-align:left">📊 线上收入分类占比</div><div class="pie-wrap"><canvas id="pieStall" width="140" height="140"></canvas><div class="pie-legend" id="st-legend"></div></div></div>
 <div class="card-row"><div class="card-mini"><div class="card-label">本月成本支出</div><div class="card-big small" id="st-cost">0.00 元</div></div><div class="card-mini"><div class="card-label">本月利润</div><div class="card-big small" id="st-profit" style="color:var(--green)">0.00</div></div></div>
-<div class="section-title">收支记录</div><div id="st-list"></div>
+<div class="section-title">收支记录</div><div id="st-list" style="display:flex;flex-direction:column;width:100%"></div>
 </div>
 <div class="page" id="page-saving">
-<div class="page-title">你好存钱</div>
+<div class="page-title">存好存钱</div>
 <div class="page-date" id="sv-date"></div>
 <div class="btn-row"><button class="btn" onclick="setSavingGoal()">🎯 设置目标</button><button class="btn" onclick="addSaving()">💰 存入</button></div>
 <div class="card goal-card"><div style="font-weight:600;margin-bottom:12px">阶段性存钱目标</div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;font-size:12px"><div><span style="color:var(--sub)">开始日期</span><div style="font-weight:600;margin-top:2px" id="sv-start">--</div></div><div><span style="color:var(--sub)">截止日期</span><div style="font-weight:600;margin-top:2px" id="sv-end">--</div></div><div><span style="color:var(--sub)">剩余天数</span><div style="font-weight:600;margin-top:2px" id="sv-days">--</div></div></div></div>
@@ -163,10 +178,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 <div class="card-row"><div class="card-mini"><div class="card-label"><span class="tag tag-orange">总目标</span></div><div class="card-big small" id="sv-total-goal">0 元</div><div class="card-sub">目标总额</div></div><div class="card-mini"><div class="card-label"><span class="tag tag-blue">月存入</span></div><div class="card-big small" id="sv-month-target">0 元</div><div class="card-sub">每月应存</div></div></div>
 <div class="card-row"><div class="card-mini"><div class="card-label"><span class="tag tag-blue">本月已存入</span></div><div class="card-big small" id="sv-month-actual">0.00 元</div><div class="card-sub">本月实际存入</div></div><div class="card-mini"><div class="card-label"><span class="tag tag-green">已存入</span> / <span class="tag tag-pink">未存入</span></div><div class="card-big small" id="sv-ratio">0.00 / 0.00</div><div class="card-sub">累计已存 / 剩余待存</div></div></div>
 <div class="card pie-card"><div style="font-weight:600;margin-bottom:10px;text-align:left">📊 已存未存情况</div><div class="pie-wrap"><canvas id="pieSaving" width="140" height="140"></canvas><div class="pie-legend" id="sv-legend"></div></div></div>
-<div class="section-title">存钱记录</div><div id="sv-list"></div>
+<div class="section-title">存钱记录</div><div id="sv-list" style="display:flex;flex-direction:column;width:100%"></div>
 </div>
 <div class="page" id="page-debt">
-<div class="page-title">负债总览</div>
+<div class="page-title">不见负债</div>
 <div class="page-date">所有负债记录与还款进度</div>
 <div class="card" style="text-align:center"><div class="card-label">负债总金额</div><div class="card-big" id="dt-total" style="color:var(--accent)">0.00</div><div class="card-sub">累计本金</div></div>
 <div class="card-row"><div class="card-mini"><div class="card-label">已还金额</div><div class="card-big small" style="color:var(--green)" id="dt-paid">0.00</div><div class="card-sub">进度 <span id="dt-progress-text">0%</span></div></div><div class="card-mini"><div class="card-label">待还金额</div><div class="card-big small" style="color:var(--red)" id="dt-remaining">0.00</div><div class="card-sub">剩余偿还</div></div></div>
@@ -175,20 +190,23 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 <div class="card pie-card"><div style="font-weight:600;margin-bottom:10px;text-align:left">📊 已还 / 未还占比</div><div class="pie-wrap"><canvas id="pieDebt" width="140" height="140"></canvas><div class="pie-legend" id="dt-legend"></div></div></div>
 <div class="btn-row"><button class="btn-add" onclick="addDebt()">+ 添加负债</button><button class="btn-add-2" onclick="showHistory('debt')">🔍 查询往月</button></div>
 <div class="section-title">负债分组</div><div id="dt-groups"></div>
-<div class="section-title">负债记录</div><div id="dt-list"></div>
+<div class="section-title">负债添加记录</div><div id="dt-list" style="display:flex;flex-direction:column;width:100%"></div>
 </div>
 </div>
 </div>
 <div class="modal-mask" id="modal"><div class="modal" id="modal-content"></div></div>
 <div class="toast" id="toast"></div>
+
 <script>
 // ====== Supabase 配置 ======
 const SUPABASE_URL = 'https://ngqqakvdvenbejqogrzs.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_SlLoqFI-C_l93hgVjsVL7A_yYWuH5ol';
 const DATA_ID = 'main_data';
+
 // ====== 密码验证 ======
 const PASSWORD = '1122';
 let pwdSession = sessionStorage.getItem('cunhaoguanjia_authed') === '1';
+
 function checkPwd() {
   const v = document.getElementById('pwd-input').value;
   if (v === PASSWORD) {
@@ -205,13 +223,17 @@ function checkPwd() {
     showToast('密码错误');
   }
 }
+
 document.getElementById('pwd-input').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') checkPwd();
 });
+
+// Auto login if session
 if (pwdSession) {
   document.getElementById('login').style.display = 'none';
   document.getElementById('app').style.display = 'flex';
 }
+
 // ====== Cloud Sync ======
 async function cloudLoad() {
   try {
@@ -221,52 +243,52 @@ async function cloudLoad() {
     });
     const arr = await res.json();
     setSyncStatus('done');
-    if (arr && arr.length > 0 && arr[0].data) return arr[0].data;
+    if (arr && arr.length > 0 && arr[0].data) {
+      return arr[0].data;
+    }
     return null;
   } catch (e) {
     setSyncStatus('error');
     return null;
   }
 }
+
 let saveTimer = null;
 async function cloudSave(data) {
   if (!data || Object.keys(data).length === 0) { return false; }
   if (!data.bookkeeping && !data.stall && !data.saving && !data.debt) { return false; }
   clearTimeout(saveTimer);
   setSyncStatus('syncing');
-  return new Promise((resolve) => {
-    saveTimer = setTimeout(async () => {
-      try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/app_data?id=eq.${DATA_ID}`, {
-          method: 'POST',
-          headers: {
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`,
-            'Content-Type': 'application/json',
-            'Prefer': 'resolution=merge-duplicates'
-          },
-          body: JSON.stringify({ id: DATA_ID, data, updated_at: new Date().toISOString() })
-        });
-        if (!res.ok) {
-          await fetch(`${SUPABASE_URL}/rest/v1/app_data?id=eq.${DATA_ID}`, {
-            method: 'PATCH',
-            headers: {
-              'apikey': SUPABASE_KEY,
-              'Authorization': `Bearer ${SUPABASE_KEY}`,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ data, updated_at: new Date().toISOString() })
-          });
-        }
-        setSyncStatus('done');
-        resolve(true);
-      } catch (e) {
-        setSyncStatus('error');
-        resolve(false);
-      }
-    }, 300);
-  });
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/app_data?id=eq.${DATA_ID}`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify({ id: DATA_ID, data, updated_at: new Date().toISOString() })
+    });
+    if (!res.ok) {
+      const res2 = await fetch(`${SUPABASE_URL}/rest/v1/app_data?id=eq.${DATA_ID}`, {
+        method: 'PATCH',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ data, updated_at: new Date().toISOString() })
+      });
+    }
+    setSyncStatus('done');
+    return true;
+  } catch (e) {
+    setSyncStatus('error');
+    return false;
+  }
 }
+
 function setSyncStatus(s) {
   const dot = document.getElementById('sync-dot');
   const txt = document.getElementById('sync-text');
@@ -274,6 +296,7 @@ function setSyncStatus(s) {
   dot.className = 'sync-dot' + (s === 'syncing' ? ' syncing' : s === 'error' ? ' error' : '');
   txt.textContent = s === 'syncing' ? '同步中...' : s === 'error' ? '同步失败' : '已同步';
 }
+
 // ====== Local cache + cloud sync ======
 let D = {};
 const LOCAL_KEY = 'cunhaoguanjia_v1';
@@ -283,32 +306,40 @@ function localLoad() {
 function localSave(d) {
   localStorage.setItem(LOCAL_KEY, JSON.stringify(d));
 }
+
 async function save() {
   localSave(D);
   await cloudSave(D);
   render();
 }
+
 async function initApp() {
-  const cloud = await cloudLoad();
-  if (cloud && Object.keys(cloud).length > 0) {
-    D = cloud;
-    localSave(D);
+  // Try local first
+  D = localLoad();
+  if (D && Object.keys(D).length > 0 && (D.bookkeeping || D.stall || D.saving || D.debt)) {
+    // Local has data, use it
   } else {
-    D = localLoad();
-    if (Object.keys(D).length === 0) {
+    // Fall back to cloud
+    const cloud = await cloudLoad();
+    if (cloud && Object.keys(cloud).length > 0) {
+      D = cloud;
+      localSave(D);
+    } else {
+      // Both empty, init defaults
       D.bookkeeping = { monthlyBudget: 500, expenses: [] };
       D.stall = { monthlyGoal: 800, records: [] };
       D.saving = { goal: 1000, start: '', end: '', records: [] };
-      D.debt = { records: [] };
-      await cloudSave(D);
+      D.debt = { records: [], log: [] };
     }
   }
   if (!D.bookkeeping) D.bookkeeping = { monthlyBudget: 500, expenses: [] };
   if (!D.stall) D.stall = { monthlyGoal: 800, records: [] };
   if (!D.saving) D.saving = { goal: 1000, start: '', end: '', records: [] };
   if (!D.debt) D.debt = { records: [] };
+  if (!D.debt.log) D.debt.log = [];
   render();
 }
+
 // ====== Utils ======
 const today = new Date();
 function ymd(d){const dt=d||new Date();return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0')}
@@ -322,35 +353,57 @@ function closeModal(){document.getElementById('modal').classList.remove('show')}
 document.querySelectorAll('.nav-item').forEach(n=>{n.onclick=()=>{document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));n.classList.add('active');document.getElementById('page-'+n.dataset.page).classList.add('active')}});
 function setBudget(){openModal('<div class="modal-title">设置月度预算</div><div class="form-group"><label class="form-label">本月预算（元）</label><input type="number" class="form-input" id="m-budget" value="'+(D.bookkeeping.monthlyBudget||0)+'"></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">取消</button><button class="btn-ok" onclick="saveBudget()">确认</button></div>')}
 function saveBudget(){D.bookkeeping.monthlyBudget=Number(document.getElementById('m-budget').value)||0;save();closeModal();showToast('已保存')}
-async function addExpense(){const amt=Number(document.getElementById('bk-amt').value);if(!amt||amt<=0)return showToast('请输入金额');const cat=document.getElementById('bk-cat').value;const note=document.getElementById('bk-note').value;const date=document.getElementById('bk-date-input').value||ymd();D.bookkeeping.expenses.push({date,cat,note,amt});document.getElementById('bk-amt').value='';document.getElementById('bk-note').value='';await save();showToast('已添加')}
+function openAddExpenseModal(){openModal('<div class="modal-title">添加花费</div><div class="form-group"><label class="form-label">分类</label><select class="form-input" id="d-cat"><option>🍜 餐饮</option><option>🚇 交通</option><option>🛒 购物</option><option>💊 医疗</option><option>🎮 娱乐</option><option>📚 学习</option><option>🏠 居家</option><option>💼 其他</option></select></div><div class="form-group"><label class="form-label">日期</label><input type="date" class="form-input" id="d-date" value="'+ymd()+'"></div><div class="form-group"><label class="form-label">备注</label><input type="text" class="form-input" id="d-note" placeholder="可选"></div><div class="form-group"><label class="form-label">金额（元）</label><input type="number" class="form-input" id="d-amt" placeholder="请输入金额"></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">取消</button><button class="btn-ok" onclick="addExpense()">确认</button></div>')}
+async function addExpense(){const amt=Number(document.getElementById('d-amt').value);if(!amt||amt<=0)return showToast('请输入金额');const cat=document.getElementById('d-cat').value;const note=document.getElementById('d-note').value;const date=document.getElementById('d-date').value||ymd();D.bookkeeping.expenses.push({date,cat,note,amt});await save();closeModal();showToast('已添加')}
 async function delExpense(i){D.bookkeeping.expenses.splice(i,1);await save()}
-function renderBookkeeping(){const bk=D.bookkeeping;const exp=bk.expenses||[];const monthExp=exp.filter(e=>e.date.startsWith(ym()));const monthSpent=monthExp.reduce((s,e)=>s+e.amt,0);const todayExp=exp.filter(e=>e.date===ymd());const todaySpent=todayExp.reduce((s,e)=>s+e.amt,0);const days=daysInMonth(today);const dailyBudget=(bk.monthlyBudget||0)/days;const dayOfMonth=today.getDate();const uptodateExp=exp.filter(e=>{const d=e.date.startsWith(ym());if(!d)return false;const day=parseInt(e.date.split('-')[2]);return day<=dayOfMonth});const uptodateSpent=uptodateExp.reduce((s,e)=>s+e.amt,0);const balance=(dailyBudget*dayOfMonth)-uptodateSpent;document.getElementById('bk-date').textContent=today.getFullYear()+'年'+(today.getMonth()+1)+'月'+today.getDate()+'日 星期'+'日一二三四五六'[today.getDay()];document.getElementById('bk-today-budget').textContent=fmt(dailyBudget)+'元';document.getElementById('bk-today-spent').textContent=fmt(todaySpent)+'元';document.getElementById('bk-today-count').textContent='共 '+todayExp.length+' 笔';document.getElementById('bk-balance').textContent=(balance>=0?fmt(balance):'-'+fmt(-balance))+'元';document.getElementById('bk-over').textContent=balance<0?'累计已超支 '+fmt(-balance)+'元':'预算充足';document.getElementById('bk-month-budget').textContent=fmt(bk.monthlyBudget||0)+'元';let inDays=0;for(let i=1;i<=today.getDate();i++){const d=new Date(today.getFullYear(),today.getMonth(),i);const dExp=exp.filter(e=>e.date===ymd(d)).reduce((s,e)=>s+e.amt,0);if(dExp<=dailyBudget)inDays++}document.getElementById('bk-in-days').textContent='当月 '+inDays+' 天在预算内';const left=(bk.monthlyBudget||0)-monthSpent;const pct=Math.min(100,Math.round(monthSpent/(bk.monthlyBudget||1)*100));document.getElementById('bk-progress').style.width=pct+'%';document.getElementById('bk-month-spent').textContent=fmt(monthSpent);document.getElementById('bk-month-left').textContent=fmt(left);const allList=monthExp.slice().reverse();const html=allList.length?allList.map((e,i)=>{const idx=exp.length-1-i;return '<div class="record"><div class="record-left"><div class="record-icon">'+e.cat.split(' ')[0]+'</div><div class="record-info"><div class="r1">'+(e.cat.split(' ')[1]||e.cat)+(e.note?' · '+e.note:'')+'</div><div class="r2">'+e.date+'</div></div><div class="record-amt neg">-'+fmt(e.amt)+'</div><button class="record-del" onclick="delExpense('+idx+')">×</button></div>'}).join(''):'<div class="empty">本月还没有记账</div>';document.getElementById('bk-list').innerHTML=html}
+function renderBookkeeping(){const bk=D.bookkeeping;const exp=bk.expenses||[];const monthExp=exp.filter(e=>e.date.startsWith(ym()));const monthSpent=monthExp.reduce((s,e)=>s+e.amt,0);const todayExp=exp.filter(e=>e.date===ymd());const todaySpent=todayExp.reduce((s,e)=>s+e.amt,0);const days=daysInMonth(today);const dailyBudget=(bk.monthlyBudget||0)/days;const dayOfMonth=today.getDate();const uptodateExp=exp.filter(e=>{const d=e.date.startsWith(ym());if(!d)return false;const day=parseInt(e.date.split('-')[2]);return day<=dayOfMonth});const uptodateSpent=uptodateExp.reduce((s,e)=>s+e.amt,0);const balance=(dailyBudget*dayOfMonth)-uptodateSpent;document.getElementById('bk-date').textContent=today.getFullYear()+'年'+(today.getMonth()+1)+'月'+today.getDate()+'日 星期'+'日一二三四五六'[today.getDay()];document.getElementById('bk-today-budget').textContent=fmt(dailyBudget)+'元';document.getElementById('bk-today-spent').textContent=fmt(todaySpent)+'元';document.getElementById('bk-today-count').textContent='共 '+todayExp.length+' 笔';document.getElementById('bk-balance').textContent=(balance>=0?fmt(balance):'-'+fmt(-balance))+'元';document.getElementById('bk-over').textContent=balance<0?'累计已超支 '+fmt(-balance)+'元':'预算充足';document.getElementById('bk-month-budget').textContent=fmt(bk.monthlyBudget||0)+'元';let inDays=0;for(let i=1;i<=today.getDate();i++){const d=new Date(today.getFullYear(),today.getMonth(),i);const dExp=exp.filter(e=>e.date===ymd(d)).reduce((s,e)=>s+e.amt,0);if(dExp<=dailyBudget)inDays++}document.getElementById('bk-in-days').textContent='当月 '+inDays+' 天在预算内';const left=(bk.monthlyBudget||0)-monthSpent;const pct=Math.min(100,Math.round(monthSpent/(bk.monthlyBudget||1)*100));document.getElementById('bk-progress').style.width=pct+'%';document.getElementById('bk-month-spent').textContent=fmt(monthSpent);document.getElementById('bk-month-left').textContent=fmt(left);const allList=(D.bookkeeping.expenses||[]).filter(e=>e.date&&e.date.startsWith(ym())).slice().reverse();const html=allList.length?allList.map((e,i)=>{const idx=D.bookkeeping.expenses.length-1-i;return '<div class="record"><div class="record-left"><div class="record-icon">🍜</div><div class="record-info"><div class="r1">'+e.cat+(e.note?' · '+e.note:'')+'</div><div class="r2">'+e.date+'</div></div></div><div style="display:flex;align-items:center"><div class="record-amt neg">-'+fmt(e.amt)+'</div><button class="record-del" onclick="delExpense('+idx+')">×</button></div></div>'}).join(''):'<div class="empty">本月还没有记账</div>';document.getElementById('bk-list').innerHTML=html}
 function setStallGoal(){openModal('<div class="modal-title">设置本月摆摊目标</div><div class="form-group"><label class="form-label">目标金额（元）</label><input type="number" class="form-input" id="m-goal" value="'+(D.stall.monthlyGoal||0)+'"></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">取消</button><button class="btn-ok" onclick="saveStallGoal()">确认</button></div>')}
 async function saveStallGoal(){D.stall.monthlyGoal=Number(document.getElementById('m-goal').value)||0;save();closeModal();showToast('已保存')}
 function addIncome(){openModal('<div class="modal-title">记录收入 / 支出</div><div class="form-group"><label class="form-label">类型</label><select class="form-select" id="m-type" onchange="toggleStallFields()"><option value="income">线上收入</option><option value="offline">线下收入</option><option value="cost">成本支出</option></select></div><div class="form-group" id="m-channel-group"><label class="form-label">线上渠道</label><select class="form-select" id="m-channel"><option>小红书</option><option>闲鱼</option><option>拼多多</option><option>抖音</option><option>自定义</option></select></div><div class="form-group"><label class="form-label">金额（元）</label><input type="number" class="form-input" id="m-amt" placeholder="请输入金额"></div><div class="form-group"><label class="form-label">说明</label><input type="text" class="form-input" id="m-note" placeholder="如：烤肠收入"></div><div class="form-group"><label class="form-label">日期</label><input type="date" class="form-input" id="m-date" value="'+ymd()+'"></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">取消</button><button class="btn-ok" onclick="saveIncome()">确认</button></div>')}
 function toggleStallFields(){const t=document.getElementById('m-type').value;document.getElementById('m-channel-group').style.display=t==='income'?'block':'none'}
 async function saveIncome(){const type=document.getElementById('m-type').value;const amt=Number(document.getElementById('m-amt').value);if(!amt||amt<=0)return showToast('请输入金额');const channel=document.getElementById('m-channel').value;const note=document.getElementById('m-note').value;const date=document.getElementById('m-date').value||ymd();D.stall.records.push({type,channel,note,amt,date});save();closeModal();showToast('已记录')}
 let pieStallObj=null;
-function renderStall(){const st=D.stall;const rec=st.records||[];const monthRec=rec.filter(r=>r.date.startsWith(ym()));const incomes=monthRec.filter(r=>r.type==='income'||r.type==='offline');const costs=monthRec.filter(r=>r.type==='cost');const totalIncome=incomes.reduce((s,r)=>s+r.amt,0);const totalCost=costs.reduce((s,r)=>s+r.amt,0);const profit=totalIncome-totalCost;const online=monthRec.filter(r=>r.type==='income').reduce((s,r)=>s+r.amt,0);const offline=monthRec.filter(r=>r.type==='offline').reduce((s,r)=>s+r.amt,0);const done=totalIncome;const target=st.monthlyGoal||0;const diff=target-done;const pct=target>0?Math.min(100,done/target*100):0;document.getElementById('st-date').textContent=today.getFullYear()+'年'+(today.getMonth()+1)+'月'+today.getDate()+'日 星期'+'日一二三四五六'[today.getDay()];document.getElementById('st-done').textContent=fmt(done);document.getElementById('st-target').textContent=fmt(target);document.getElementById('st-diff').textContent=fmt(diff);document.getElementById('st-progress').style.width=pct+'%';document.getElementById('st-percent').textContent=pct.toFixed(1)+'%';const todayRec=rec.filter(r=>r.date===ymd());const todayOnline=todayRec.filter(r=>r.type==='income').reduce((s,r)=>s+r.amt,0);const todayOffline=todayRec.filter(r=>r.type==='offline').reduce((s,r)=>s+r.amt,0);document.getElementById('st-online-today').textContent=fmt(todayOnline)+' 元';document.getElementById('st-offline-today').textContent=fmt(todayOffline)+' 元';document.getElementById('st-online-count').textContent=todayRec.filter(r=>r.type==='income').length+' 笔';document.getElementById('st-offline-count').textContent=todayRec.filter(r=>r.type==='offline').length+' 笔';document.getElementById('st-total').textContent=fmt(totalIncome)+' 元';const onlinePct=totalIncome>0?Math.round(online/totalIncome*100):0;document.getElementById('st-percent-detail').textContent='线上 '+onlinePct+'% · 线下 '+(totalIncome>0?100-onlinePct:0)+'%';document.getElementById('st-cost').textContent=fmt(totalCost)+' 元';document.getElementById('st-profit').textContent=fmt(profit);const channelMap={};monthRec.filter(r=>r.type==='income').forEach(r=>{channelMap[r.channel]=(channelMap[r.channel]||0)+r.amt});const ctx=document.getElementById('pieStall');if(pieStallObj)pieStallObj.destroy();const chKeys=Object.keys(channelMap);if(chKeys.length>0){pieStallObj=new Chart(ctx,{type:'doughnut',data:{labels:chKeys,datasets:[{data:chKeys.map(k=>channelMap[k]),backgroundColor:['#7ba7d9','#e9c465','#d99fb0','#6cc28b','#f5a04e','#e57b85'],borderWidth:0}]},options:{cutout:'60%',plugins:{legend:{display:false}}}});document.getElementById('st-legend').innerHTML=chKeys.map((k,i)=>'<div class="pie-legend-item"><div class="pie-dot" style="background:'+['#7ba7d9','#e9c465','#d99fb0','#6cc28b','#f5a04e','#e57b85'][i%6]+'"></div>'+k+'<span class="pie-amt">'+fmt(channelMap[k])+'</span></div>').join('')}else{document.getElementById('st-legend').innerHTML='<div class="empty">暂无线上收入</div>'}const mlist=monthRec.slice().reverse();const h=mlist.length?mlist.map((r,i)=>{const idx=rec.length-1-i;return '<div class="record"><div class="record-left"><div class="record-icon">'+(r.type==='cost'?'💸':r.type==='income'?'📱':'🏪')+'</div><div class="record-info"><div class="r1">'+(r.type==='cost'?'成本':r.channel||'线下')+(r.note?' · '+r.note:'')+'</div><div class="r2">'+r.date+'</div></div></div><div class="record-amt '+(r.type==='cost'?'neg':'pos')+'">'+(r.type==='cost'?'-':'+')+fmt(r.amt)+'</div><button class="record-del" onclick="delStall('+idx+')">×</button></div>'}).join(''):'<div class="empty">本月暂无记录</div>';document.getElementById('st-list').innerHTML=h}
+function renderStall(){const st=D.stall;const rec=st.records||[];const monthRec=rec.filter(r=>r.date.startsWith(ym()));const incomes=monthRec.filter(r=>r.type==='income'||r.type==='offline');const costs=monthRec.filter(r=>r.type==='cost');const totalIncome=incomes.reduce((s,r)=>s+r.amt,0);const totalCost=costs.reduce((s,r)=>s+r.amt,0);const profit=totalIncome-totalCost;const online=monthRec.filter(r=>r.type==='income').reduce((s,r)=>s+r.amt,0);const offline=monthRec.filter(r=>r.type==='offline').reduce((s,r)=>s+r.amt,0);const done=totalIncome;const target=st.monthlyGoal||0;const diff=target-done;const pct=target>0?Math.min(100,done/target*100):0;document.getElementById('st-date').textContent=today.getFullYear()+'年'+(today.getMonth()+1)+'月'+today.getDate()+'日 星期'+'日一二三四五六'[today.getDay()];document.getElementById('st-done').textContent=fmt(done);document.getElementById('st-target').textContent=fmt(target);document.getElementById('st-diff').textContent=fmt(diff);document.getElementById('st-progress').style.width=pct+'%';document.getElementById('st-percent').textContent=pct.toFixed(1)+'%';const todayRec=rec.filter(r=>r.date===ymd());const todayOnline=todayRec.filter(r=>r.type==='income').reduce((s,r)=>s+r.amt,0);const todayOffline=todayRec.filter(r=>r.type==='offline').reduce((s,r)=>s+r.amt,0);document.getElementById('st-online-today').textContent=fmt(todayOnline)+' 元';document.getElementById('st-offline-today').textContent=fmt(todayOffline)+' 元';document.getElementById('st-online-count').textContent=todayRec.filter(r=>r.type==='income').length+' 笔';document.getElementById('st-offline-count').textContent=todayRec.filter(r=>r.type==='offline').length+' 笔';document.getElementById('st-total').textContent=fmt(totalIncome)+' 元';const onlinePct=totalIncome>0?Math.round(online/totalIncome*100):0;document.getElementById('st-percent-detail').textContent='线上 '+onlinePct+'% · 线下 '+(totalIncome>0?100-onlinePct:0)+'%';const channelMap={};monthRec.filter(r=>r.type==='income').forEach(r=>{channelMap[r.channel]=(channelMap[r.channel]||0)+r.amt});const labels=Object.keys(channelMap);const data=labels.map(l=>channelMap[l]);const colors=['#e9c465','#d99fb0','#7ba7d9','#6cc28b','#f5a04e','#b88fd9','#5fb4b4'];const ctx=document.getElementById('pieStall');if(pieStallObj)pieStallObj.destroy();if(labels.length){pieStallObj=new Chart(ctx,{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors.slice(0,labels.length),borderWidth:0}]},options:{cutout:'60%',plugins:{legend:{display:false}}}})}else{ctx.getContext('2d').clearRect(0,0,200,200)}const legendHtml=labels.length?labels.map((l,i)=>'<div class="pie-legend-item"><div class="pie-dot" style="background:'+colors[i]+'"></div>'+l+'<span class="pie-amt">'+channelMap[l]+' ('+(channelMap[l]/(online||1)*100).toFixed(0)+'%)</span></div>').join(''):'<div class="empty">暂无数据</div>';document.getElementById('st-legend').innerHTML=legendHtml;document.getElementById('st-cost').textContent=fmt(totalCost)+' 元';document.getElementById('st-profit').textContent=fmt(profit);const sorted=rec.slice().reverse();const html=sorted.length?sorted.map((r,ri)=>{const i=rec.length-1-ri;let label='',amtClass='',sign='';if(r.type==='income'){label='线上 · '+r.channel;amtClass='pos';sign='+'}else if(r.type==='offline'){label='线下 · '+(r.channel||'收入');amtClass='pos';sign='+'}else{label='成本支出'+(r.note?' · '+r.note:'');amtClass='neg';sign='-'}return '<div class="record"><div class="record-left"><div class="record-icon">'+(r.type==='cost'?'💸':(r.type==='offline'?'🏪':'📱'))+'</div><div class="record-info"><div class="r1">'+label+'</div><div class="r2">'+r.date+'</div></div></div><div style="display:flex;align-items:center"><div class="record-amt '+amtClass+'">'+sign+fmt(r.amt)+'</div><button class="record-del" onclick="delStall('+i+')">×</button></div></div>'}).join(''):'<div class="empty">还没有摆摊记录</div>';document.getElementById('st-list').innerHTML=html}
 async function delStall(i){D.stall.records.splice(i,1);await save()}
 function setSavingGoal(){openModal('<div class="modal-title">设置存钱目标</div><div class="form-group"><label class="form-label">总目标（元）</label><input type="number" class="form-input" id="m-sv-goal" value="'+(D.saving.goal||0)+'"></div><div class="form-group"><label class="form-label">开始日期</label><input type="date" class="form-input" id="m-sv-start" value="'+(D.saving.start||ymd())+'"></div><div class="form-group"><label class="form-label">截止日期</label><input type="date" class="form-input" id="m-sv-end" value="'+(D.saving.end||'')+'"></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">取消</button><button class="btn-ok" onclick="saveSavingGoal()">确认</button></div>')}
 async function saveSavingGoal(){D.saving.goal=Number(document.getElementById('m-sv-goal').value)||0;D.saving.start=document.getElementById('m-sv-start').value;D.saving.end=document.getElementById('m-sv-end').value;await save();closeModal();showToast('已保存')}
 function addSaving(){openModal('<div class="modal-title">存入</div><div class="form-group"><label class="form-label">金额（元）</label><input type="number" class="form-input" id="sv-amt" placeholder="请输入存入金额"></div><div class="form-group"><label class="form-label">日期</label><input type="date" class="form-input" id="sv-date" value="'+ymd()+'"></div><div class="form-group"><label class="form-label">备注</label><input type="text" class="form-input" id="sv-note" placeholder="如：工资"></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">取消</button><button class="btn-ok" onclick="saveSaving()">确认</button></div>')}
 async function saveSaving(){const amt=Number(document.getElementById('sv-amt').value);if(!amt||amt<=0)return showToast('请输入金额');D.saving.records.push({date:document.getElementById('sv-date').value||ymd(),amt,note:document.getElementById('sv-note').value});save();closeModal();showToast('已存入')}
 let pieSavingObj=null;
-function renderSaving(){const sv=D.saving;const rec=sv.records||[];const totalSaved=rec.reduce((s,r)=>s+r.amt,0);const goal=sv.goal||0;const remaining=Math.max(0,goal-totalSaved);document.getElementById('sv-date').textContent=today.getFullYear()+'年'+(today.getMonth()+1)+'月'+today.getDate()+'日 星期'+'日一二三四五六'[today.getDay()];document.getElementById('sv-start').textContent=sv.start||'--';document.getElementById('sv-end').textContent=sv.end||'--';if(sv.start&&sv.end){const left=daysBetween(ymd(),sv.end);document.getElementById('sv-days').textContent=left>0?left+' 天':'已到期'}else{document.getElementById('sv-days').textContent='--'}const pct=goal>0?Math.min(100,totalSaved/goal*100):0;document.getElementById('sv-progress').style.width=pct+'%';document.getElementById('sv-percent-text').textContent=pct.toFixed(1)+'%';document.getElementById('sv-total-goal').textContent=fmt(goal)+' 元';let monthTarget=0;if(sv.start&&sv.end){const months=Math.max(1,daysBetween(sv.start,sv.end)/30);monthTarget=goal/months}document.getElementById('sv-month-target').textContent=fmt(monthTarget)+' 元';const monthRec=rec.filter(r=>r.date.startsWith(ym()));const monthActual=monthRec.reduce((s,r)=>s+r.amt,0);document.getElementById('sv-month-actual').textContent=fmt(monthActual)+' 元';document.getElementById('sv-ratio').textContent=fmt(totalSaved)+' / '+fmt(remaining);const ctx=document.getElementById('pieSaving');if(pieSavingObj)pieSavingObj.destroy();if(goal>0){pieSavingObj=new Chart(ctx,{type:'doughnut',data:{labels:['已存入','未存入'],datasets:[{data:[totalSaved,remaining],backgroundColor:['#6cc28b','#e57b85'],borderWidth:0}]},options:{cutout:'60%',plugins:{legend:{display:false}}}});document.getElementById('sv-legend').innerHTML='<div class="pie-legend-item"><div class="pie-dot" style="background:#6cc28b"></div>已存入<span class="pie-amt">'+fmt(totalSaved)+' ('+pct.toFixed(0)+'%)</span></div><div class="pie-legend-item"><div class="pie-dot" style="background:#e57b85"></div>未存入<span class="pie-amt">'+fmt(remaining)+' ('+(100-pct).toFixed(0)+'%)</span></div>'}else{document.getElementById('sv-legend').innerHTML=''}const mlist=rec.slice().reverse();const h=mlist.length?mlist.map((r,i)=>{const idx=rec.length-1-i;return '<div class="record"><div class="record-left"><div class="record-icon">💰</div><div class="record-info"><div class="r1">存入 '+fmt(r.amt)+' 元'+(r.note?' · '+r.note:'')+'</div><div class="r2">'+r.date+'</div></div></div><button class="record-del" onclick="delSaving('+idx+')">×</button></div>'}).join(''):'<div class="empty">暂无存钱记录</div>';document.getElementById('sv-list').innerHTML=h}
+function renderSaving(){const sv=D.saving;const rec=sv.records||[];const totalSaved=rec.reduce((s,r)=>s+r.amt,0);const goal=sv.goal||0;const remaining=Math.max(0,goal-totalSaved);document.getElementById('sv-date').textContent=today.getFullYear()+'年'+(today.getMonth()+1)+'月'+today.getDate()+'日 星期'+'日一二三四五六'[today.getDay()];document.getElementById('sv-start').textContent=sv.start||'--';document.getElementById('sv-end').textContent=sv.end||'--';if(sv.start&&sv.end){const left=daysBetween(ymd(),sv.end);document.getElementById('sv-days').textContent=left>0?left+' 天':'已到期'}else{document.getElementById('sv-days').textContent='--'}const pct=goal>0?Math.min(100,totalSaved/goal*100):0;document.getElementById('sv-progress').style.width=pct+'%';document.getElementById('sv-percent-text').textContent=pct.toFixed(1)+'%';document.getElementById('sv-total-goal').textContent=fmt(goal)+' 元';let monthTarget=0;if(sv.start&&sv.end){const months=Math.max(1,daysBetween(sv.start,sv.end)/30);monthTarget=goal/months}document.getElementById('sv-month-target').textContent=fmt(monthTarget)+' 元';const monthRec=rec.filter(r=>r.date.startsWith(ym()));const monthActual=monthRec.reduce((s,r)=>s+r.amt,0);document.getElementById('sv-month-actual').textContent=fmt(monthActual)+' 元';document.getElementById('sv-ratio').textContent=fmt(totalSaved)+' / '+fmt(remaining);const ctx=document.getElementById('pieSaving');if(pieSavingObj)pieSavingObj.destroy();if(goal>0){pieSavingObj=new Chart(ctx,{type:'doughnut',data:{labels:['已存入','未存入'],datasets:[{data:[totalSaved,remaining],backgroundColor:['#6cc28b','#e57b85'],borderWidth:0}]},options:{cutout:'60%',plugins:{legend:{display:false}}}});document.getElementById('sv-legend').innerHTML='<div class="pie-legend-item"><div class="pie-dot" style="background:#6cc28b"></div>已存入<span class="pie-amt">'+fmt(totalSaved)+' ('+pct.toFixed(0)+'%)</span></div><div class="pie-legend-item"><div class="pie-dot" style="background:#e57b85"></div>未存入<span class="pie-amt">'+fmt(remaining)+' ('+(100-pct).toFixed(0)+'%)</span></div>'}else{ctx.getContext('2d').clearRect(0,0,200,200);document.getElementById('sv-legend').innerHTML='<div class="empty">请先设置目标</div>'}const sorted=rec.slice().reverse();const html=sorted.length?sorted.map((r,ri)=>{const i=rec.length-1-ri;return '<div class="record"><div class="record-left"><div class="record-icon">💰</div><div class="record-info"><div class="r1">存入'+(r.note?' · '+r.note:'')+'</div><div class="r2">'+r.date+'</div></div></div><div style="display:flex;align-items:center"><div class="record-amt pos">+'+fmt(r.amt)+'</div><button class="record-del" onclick="delSaving('+i+')">×</button></div></div>'}).join(''):'<div class="empty">还没有存钱记录</div>';document.getElementById('sv-list').innerHTML=html}
 async function delSaving(i){D.saving.records.splice(i,1);await save()}
 function addDebt(){openModal('<div class="modal-title">添加负债</div><div class="form-group"><label class="form-label">负债名称</label><input type="text" class="form-input" id="d-name" placeholder="如：信用卡"></div><div class="form-group"><label class="form-label">本金（元）</label><input type="number" class="form-input" id="d-amt" placeholder="负债金额"></div><div class="form-group"><label class="form-label">日期</label><input type="date" class="form-input" id="d-date" value="'+ymd()+'"></div><div class="form-group"><label class="form-label">备注</label><input type="text" class="form-input" id="d-note" placeholder="可选"></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">取消</button><button class="btn-ok" onclick="saveDebt()">确认</button></div>')}
-async function saveDebt(){const name=document.getElementById('d-name').value;const amt=Number(document.getElementById('d-amt').value);if(!name)return showToast('请输入名称');if(!amt||amt<=0)return showToast('请输入金额');D.debt.records.push({name,amt,date:document.getElementById('d-date').value||ymd(),note:document.getElementById('d-note').value,paid:0});save();closeModal();showToast('已添加')}
+async function saveDebt(){const name=document.getElementById('d-name').value;const amt=Number(document.getElementById('d-amt').value);if(!name)return showToast('请输入名称');if(!amt||amt<=0)return showToast('请输入金额');const date=document.getElementById('d-date').value||ymd();const note=document.getElementById('d-note').value;D.debt.records.push({name,amt,date,note,paid:0});D.debt.log.push({type:'add',name,amt,date,note});await save();closeModal();showToast('已添加')}
 function payDebt(i){const rec=D.debt.records[i];openModal('<div class="modal-title">还款 · '+rec.name+'</div><div class="form-group"><label class="form-label">还款金额（元）</label><input type="number" class="form-input" id="p-amt" placeholder="剩余 '+fmt(rec.amt-rec.paid)+'"></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">取消</button><button class="btn-ok" onclick="doPay('+i+')">确认</button></div>')}
 async function doPay(i){const rec=D.debt.records[i];const amt=Number(document.getElementById('p-amt').value);if(!amt||amt<=0)return showToast('请输入金额');rec.paid=(rec.paid||0)+amt;rec.lastPayDate=ymd();save();closeModal();showToast('已还款')}
 async function delDebt(i){D.debt.records.splice(i,1);await save()}
-function renderDebtGroups(){const rec=D.debt.records||[];const groupMap={};rec.forEach(r=>{if(!groupMap[r.name])groupMap[r.name]={total:0,paid:0,records:[]};groupMap[r.name].total+=r.amt;groupMap[r.name].paid+=(r.paid||0);groupMap[r.name].records.push(r)});const names=Object.keys(groupMap);const html=names.length?names.map(name=>{const g=groupMap[name];const remaining=g.total-g.paid;const pct=g.total>0?Math.min(100,g.paid/g.total*100):0;return '<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="font-weight:600">'+name+'</div><div style="text-align:right"><div style="font-size:18px;font-weight:700;color:var(--red)">'+fmt(remaining)+'</div><div style="font-size:10px;color:var(--sub)">待还</div></div></div><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--sub);margin-bottom:4px"><span>总 '+fmt(g.total)+' · 已还 '+fmt(g.paid)+'</span><span>'+pct.toFixed(0)+'%</span></div><div class="progress" style="margin-top:6px"><div class="progress-fill" style="width:'+pct+'%;background:linear-gradient(90deg,var(--green),#5aa876)"></div></div><div style="display:flex;gap:8px;margin-top:10px"><button class="btn-add-2" onclick="payDebtGroup(\''+name+'\')" style="flex:1;padding:8px;font-size:12px">💰 还款</button></div></div>'}).join(''):'<div class="empty">还没有负债记录</div>';document.getElementById('dt-groups').innerHTML=html}
+async function delDebtLog(i){
+  const entry=D.debt.log[i];
+  if(!entry)return;
+  if(entry.type==='add'){
+    // 回滚：从 records 中找到第一个匹配 name+amt+date 的删除
+    const idx=D.debt.records.findIndex(r=>r.name===entry.name&&r.amt===entry.amt&&r.date===entry.date&&(r.paid||0)===0);
+    if(idx>=0)D.debt.records.splice(idx,1);
+  }else if(entry.type==='pay'){
+    // 回滚：从该 name 的 records 中按顺序减回去
+    let remain=entry.amt;
+    for(const r of D.debt.records){
+      if(r.name!==entry.name)continue;
+      const paid=r.paid||0;
+      if(paid<=0)continue;
+      if(remain>=paid){r.paid=0;remain-=paid}else{r.paid=paid-remain;remain=0}
+      if(remain<=0)break;
+    }
+  }
+  D.debt.log.splice(i,1);
+  await save();
+}
+function renderDebtGroups(){const rec=D.debt.records||[];const groupMap={};rec.forEach(r=>{if(!groupMap[r.name])groupMap[r.name]={total:0,paid:0,records:[]};groupMap[r.name].total+=r.amt;groupMap[r.name].paid+=(r.paid||0);groupMap[r.name].records.push(r)});const names=Object.keys(groupMap);const html=names.length?names.map(name=>{const g=groupMap[name];const remaining=g.total-g.paid;const pct=g.total>0?Math.min(100,g.paid/g.total*100):0;return '<div class="debt-group-card"><div class="row1"><div class="name">'+name+'</div><div><div class="remain">'+fmt(remaining)+'</div><div class="remain-sub">待还</div></div></div><div class="row2"><span>总 '+fmt(g.total)+' · 已还 '+fmt(g.paid)+'</span><span>'+pct.toFixed(0)+'%</span></div><div class="progress"><div class="progress-fill" style="width:'+pct+'%;background:linear-gradient(90deg,var(--green),#5aa876)"></div></div><button class="btn-add-2 pay-btn" onclick="payDebtGroup(\''+name+'\')" style="width:100%">💰 还款</button></div>'}).join(''):'<div class="empty">还没有负债记录</div>';document.getElementById('dt-groups').innerHTML=html}
 function payDebtGroup(name){openModal('<div class="modal-title">还款 · '+name+'</div><div class="form-group"><label class="form-label">还款金额（元）</label><input type="number" class="form-input" id="pg-amt" placeholder="请输入还款金额"></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">取消</button><button class="btn-ok" onclick="doPayGroup(\''+name+'\')">确认</button></div>')}
-async function doPayGroup(name){const amt=Number(document.getElementById('pg-amt').value);if(!amt||amt<=0)return showToast('请输入金额');const recs=D.debt.records.filter(r=>r.name===name);let remain=amt;for(const r of recs){if(remain<=0)break;const left=r.amt-(r.paid||0);if(left<=0)continue;if(remain>=left){r.paid=r.amt;remain-=left}else{r.paid=(r.paid||0)+remain;remain=0}r.lastPayDate=ymd()}await save();closeModal();showToast('已还款')}
-function renderDebt(){const rec=D.debt.records||[];const total=rec.reduce((s,r)=>s+r.amt,0);const paid=rec.reduce((s,r)=>s+(r.paid||0),0);const remaining=total-paid;const monthPaid=rec.filter(r=>r.lastPayDate&&r.lastPayDate.startsWith(ym())).reduce((s,r)=>s+(r.paid||0),0);const monthNew=rec.filter(r=>r.date.startsWith(ym())).reduce((s,r)=>s+r.amt,0);const pct=total>0?Math.min(100,paid/total*100):0;document.getElementById('dt-total').textContent=fmt(total);document.getElementById('dt-paid').textContent=fmt(paid);document.getElementById('dt-remaining').textContent=fmt(remaining);document.getElementById('dt-progress-text').textContent=pct.toFixed(0)+'%';document.getElementById('dt-month-paid').textContent=fmt(monthPaid);document.getElementById('dt-month-new').textContent=fmt(monthNew);document.getElementById('dt-progress').style.width=pct+'%';document.getElementById('dt-progress-num').textContent=pct.toFixed(0)+'%';const ctx=document.getElementById('pieDebt');if(window.pieDebtObj)window.pieDebtObj.destroy();if(total>0){window.pieDebtObj=new Chart(ctx,{type:'doughnut',data:{labels:['已还','未还'],datasets:[{data:[paid,remaining],backgroundColor:['#6cc28b','#e57b85'],borderWidth:0}]},options:{cutout:'60%',plugins:{legend:{display:false}}}});document.getElementById('dt-legend').innerHTML='<div class="pie-legend-item"><div class="pie-dot" style="background:#6cc28b"></div>已还<span class="pie-amt">'+fmt(paid)+' ('+pct.toFixed(0)+'%)</span></div><div class="pie-legend-item"><div class="pie-dot" style="background:#e57b85"></div>未还<span class="pie-amt">'+fmt(remaining)+' ('+(100-pct).toFixed(0)+'%)</span></div>'}else{document.getElementById('dt-legend').innerHTML=''}renderDebtGroups();const html=rec.length?rec.slice().reverse().map((r,i)=>{const idx=rec.length-1-i;return '<div class="record"><div class="record-left"><div class="record-icon">📋</div><div class="record-info"><div class="r1">'+r.name+(r.note?' · '+r.note:'')+'</div><div class="r2">'+r.date+' · 本金 '+fmt(r.amt)+' · 已还 '+fmt(r.paid||0)+'</div></div></div><div class="record-amt neg">'+fmt(r.amt-(r.paid||0))+'</div><button class="record-del" onclick="delDebt('+idx+')">×</button></div>'}).join(''):'<div class="empty">还没有负债记录</div>';document.getElementById('dt-list').innerHTML=html}
+async function doPayGroup(name){const amt=Number(document.getElementById('pg-amt').value);if(!amt||amt<=0)return showToast('请输入金额');const recs=D.debt.records.filter(r=>r.name===name);let remain=amt;for(const r of recs){if(remain<=0)break;const left=r.amt-(r.paid||0);if(left<=0)continue;if(remain>=left){r.paid=r.amt;remain-=left}else{r.paid=(r.paid||0)+remain;remain=0}r.lastPayDate=ymd()}const payDate=ymd();D.debt.log.push({type:'pay',name,amt:amt-remain,date:payDate});await save();closeModal();showToast('已还款')}
+function renderDebt(){const rec=D.debt.records||[];const total=rec.reduce((s,r)=>s+r.amt,0);const paid=rec.reduce((s,r)=>s+(r.paid||0),0);const remaining=total-paid;const monthPaid=rec.filter(r=>r.lastPayDate&&r.lastPayDate.startsWith(ym())).reduce((s,r)=>s+(r.paid||0),0);const monthNew=rec.filter(r=>r.date.startsWith(ym())).reduce((s,r)=>s+r.amt,0);const pct=total>0?Math.min(100,paid/total*100):0;document.getElementById('dt-total').textContent=fmt(total);document.getElementById('dt-paid').textContent=fmt(paid);document.getElementById('dt-remaining').textContent=fmt(remaining);document.getElementById('dt-progress-text').textContent=pct.toFixed(0)+'%';document.getElementById('dt-month-paid').textContent=fmt(monthPaid);document.getElementById('dt-month-new').textContent=fmt(monthNew);document.getElementById('dt-progress').style.width=pct+'%';document.getElementById('dt-progress-num').textContent=pct.toFixed(0)+'%';const ctx=document.getElementById('pieDebt');if(window.pieDebtObj)window.pieDebtObj.destroy();if(total>0){window.pieDebtObj=new Chart(ctx,{type:'doughnut',data:{labels:['已还','未还'],datasets:[{data:[paid,remaining],backgroundColor:['#6cc28b','#e57b85'],borderWidth:0}]},options:{cutout:'60%',plugins:{legend:{display:false}}}});document.getElementById('dt-legend').innerHTML='<div class="pie-legend-item"><div class="pie-dot" style="background:#6cc28b"></div>已还<span class="pie-amt">'+fmt(paid)+' ('+pct.toFixed(0)+'%)</span></div><div class="pie-legend-item"><div class="pie-dot" style="background:#e57b85"></div>未还<span class="pie-amt">'+fmt(remaining)+' ('+(100-pct).toFixed(0)+'%)</span></div>'}else{document.getElementById('dt-legend').innerHTML=''}renderDebtGroups();const dtLog=(D.debt.log||[]).slice().reverse();const dtHtml=dtLog.length?dtLog.map((r,i)=>{const idx=D.debt.log.length-1-i;const isAdd=r.type==='add';const icon=isAdd?'📋':'💰';const sign=isAdd?'+':'-';const cls=isAdd?'neg':'pos';const sub=isAdd?'增加负债':'还款';return '<div class="record"><div class="record-left"><div class="record-icon">'+icon+'</div><div class="record-info"><div class="r1">'+r.name+' · '+sub+(r.note?' · '+r.note:'')+'</div><div class="r2">'+r.date+'</div></div></div><div style="display:flex;align-items:center"><div class="record-amt '+cls+'">'+sign+fmt(r.amt)+'</div><button class="record-del" onclick="delDebtLog('+idx+')">×</button></div></div>'}).join(''):'<div class="empty">还没有负债添加记录</div>';document.getElementById('dt-list').innerHTML=dtHtml}
 function showHistory(t){openModal('<div class="modal-title">查询往月</div><div class="form-group"><label class="form-label">选择月份</label><input type="month" class="form-input" id="h-month" value="'+ym()+'"></div><div id="h-result" style="max-height:50vh;overflow-y:auto"></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">关闭</button><button class="btn-ok" onclick="doHistory(\''+t+'\')">查询</button></div>');doHistory(t)}
-function doHistory(t){const m=document.getElementById('h-month').value;let html='<div style="padding:8px 0">';if(t==='bookkeeping'){const exp=D.bookkeeping.expenses.filter(e=>e.date.startsWith(m));const total=exp.reduce((s,e)=>s+e.amt,0);html+='<div style="font-weight:600;margin-bottom:8px">'+m+' 共支出 '+fmt(total)+' 元 ('+exp.length+' 笔)</div>';html+=exp.length?exp.map(e=>'<div class="record"><div class="record-info"><div class="r1">'+e.cat+' '+(e.note||'')+'</div><div class="r2">'+e.date+'</div></div><div class="record-amt neg">-'+fmt(e.amt)+'</div></div>').join(''):'<div class="empty">无记录</div>'}else if(t==='stall'){const rec=D.stall.records.filter(r=>r.date.startsWith(m));const income=rec.filter(r=>r.type!=='cost').reduce((s,r)=>s+r.amt,0);const cost=rec.filter(r=>r.type==='cost').reduce((s,r)=>s+r.amt,0);html+='<div style="font-weight:600;margin-bottom:8px">'+m+' 收入 '+fmt(income)+' / 成本 '+fmt(cost)+' / 利润 '+fmt(income-cost)+'</div>';html+=rec.length?rec.map(r=>'<div class="record"><div class="record-info"><div class="r1">'+(r.type==='cost'?'成本':r.channel||'线下')+' '+(r.note||'')+'</div><div class="r2">'+r.date+'</div></div><div class="record-amt '+(r.type==='cost'?'neg':'pos')+'">'+(r.type==='cost'?'-':'+')+fmt(r.amt)+'</div></div>').join(''):'<div class="empty">无记录</div>'}else if(t==='debt'){const rec=D.debt.records.filter(r=>r.date.startsWith(m));const total=rec.reduce((s,r)=>s+r.amt,0);const paid=rec.reduce((s,r)=>s+(r.paid||0),0);const remaining=total-paid;html+='<div style="font-weight:600;margin-bottom:8px">'+m+' 负债 '+fmt(total)+' / 已还 '+fmt(paid)+' / 待还 '+fmt(remaining)+' ('+rec.length+' 笔)</div>';html+=rec.length?rec.map(r=>'<div class="record"><div class="record-info"><div class="r1">'+r.name+' '+(r.note||'')+'</div><div class="r2">'+r.date+' · 本金 '+fmt(r.amt)+' · 已还 '+fmt(r.paid||0)+'</div></div></div>').join(''):'<div class="empty">无记录</div>'}html+='</div>';document.getElementById('h-result').innerHTML=html}
+function doHistory(t){const m=document.getElementById('h-month').value;let html='<div style="padding:8px 0">';if(t==='bookkeeping'){const exp=D.bookkeeping.expenses.filter(e=>e.date.startsWith(m));const total=exp.reduce((s,e)=>s+e.amt,0);html+='<div style="font-weight:600;margin-bottom:8px">'+m+' 共支出 '+fmt(total)+' 元 ('+exp.length+' 笔)</div>';html+=exp.length?exp.map(e=>'<div class="record"><div class="record-info"><div class="r1">'+e.cat+' '+(e.note||'')+'</div><div class="r2">'+e.date+'</div></div><div class="record-amt neg">-'+fmt(e.amt)+'</div></div>').join(''):'<div class="empty">无记录</div>'}else if(t==='stall'){const rec=D.stall.records.filter(r=>r.date.startsWith(m));const income=rec.filter(r=>r.type!=='cost').reduce((s,r)=>s+r.amt,0);const cost=rec.filter(r=>r.type==='cost').reduce((s,r)=>s+r.amt,0);html+='<div style="font-weight:600;margin-bottom:8px">'+m+' 收入 '+fmt(income)+' / 成本 '+fmt(cost)+' / 利润 '+fmt(income-cost)+'</div>';html+=rec.length?rec.map(r=>'<div class="record"><div class="record-info"><div class="r1">'+(r.type==='cost'?'成本':r.channel||'线下')+' '+(r.note||'')+'</div><div class="r2">'+r.date+'</div></div><div class="record-amt '+(r.type==='cost'?'neg':'pos')+'">'+(r.type==='cost'?'-':'+')+fmt(r.amt)+'</div></div>').join(''):'<div class="empty">无记录</div>'}else if(t==='debt'){const rec=D.debt.records.filter(r=>r.date.startsWith(m));const total=rec.reduce((s,r)=>s+r.amt,0);const paid=rec.reduce((s,r)=>s+(r.paid||0),0);const remaining=total-paid;html+='<div style="font-weight:600;margin-bottom:8px">'+m+' 负债 '+fmt(total)+' 元 / 已还 '+fmt(paid)+' / 待还 '+fmt(remaining)+' ('+rec.length+' 笔)</div>';html+=rec.length?rec.map(r=>'<div class="record"><div class="record-info"><div class="r1">'+r.name+' '+(r.note||'')+'</div><div class="r2">'+r.date+' · 本金 '+fmt(r.amt)+' · 已还 '+fmt(r.paid||0)+'</div></div></div>').join(''):'<div class="empty">无记录</div>'}html+='</div>';document.getElementById('h-result').innerHTML=html}
 function render(){renderBookkeeping();renderStall();renderSaving();renderDebt()}
 </script>
 </body>
