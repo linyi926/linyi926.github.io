@@ -80,6 +80,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 .pie-legend-item{display:flex;align-items:center;gap:5px;margin-bottom:4px;font-size:11px}
 .pie-dot{width:8px;height:8px;border-radius:50%}
 .pie-amt{font-weight:600;margin-left:auto}
+/* 摆摊 · 本月总收入卡片内的线上线下饼图（尺寸对齐已有饼图 140×140，背景透出卡片底色） */
+.st-pie-row{display:flex;align-items:center;gap:12px;margin-top:4px}
+.st-pie-box{width:140px;height:140px;flex:0 0 140px;background:transparent;display:flex;align-items:center;justify-content:center}
+.st-pie-box canvas{width:100%!important;height:100%!important;max-width:140px;max-height:140px}
+.st-pie-lg{flex:1;min-width:0;display:flex;flex-direction:column;gap:12px}
+.st-pie-lg-item{display:flex;align-items:center;gap:6px;font-size:12px;color:#7a4a25;line-height:1.2}
+.st-pie-lg-item .pie-dot{width:9px;height:9px;flex:0 0 9px}
+.st-pie-lg-name{font-weight:600}
+.st-pie-lg-pct{margin-left:auto;font-weight:700;font-size:14px;color:#7a4a25}
+.st-pie-lg-amt{font-size:10px;color:#a06a3e;margin:3px 0 0 15px}
 .modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:100;padding:16px}
 .modal-mask.show{display:flex}
 .modal{background:#fff;border-radius:16px;padding:18px;width:100%;max-width:360px;max-height:85vh;overflow-y:auto}
@@ -116,8 +126,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 
 /* 存钱计划 爱心格子 */
-.pg-heart{--pg-cell:12px;display:flex;flex-direction:column;align-items:center;gap:1px;padding:2px 0}
-.pg-row{display:flex;gap:1px;max-width:100%}
+@property --pg-cell{syntax:'<length>';inherits:true;initial-value:12px}
+.pg-viewport{width:100%;max-height:68vh;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-x pan-y;position:relative;border-radius:8px}
+.pg-viewport.zooming{touch-action:none}
+.pg-viewport.zoomed{box-shadow:inset 0 0 0 1px #f0e8ec}
+.pg-heart{--pg-cell:12px;display:flex;flex-direction:column;align-items:center;gap:1px;padding:2px 0;width:max-content;min-width:100%;margin:0 auto}
+.pg-row{display:flex;gap:1px}
+.pg-zbar{display:flex;align-items:center;gap:4px}
+.pg-zbtn{min-width:24px;height:24px;padding:0 6px;border:1px solid var(--border);background:#fff;border-radius:7px;color:var(--sub);font-size:13px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent}
+.pg-zbtn:active{background:#f3f1ec;color:var(--text);border-color:#d9d5cc}
+.pg-zval{min-width:34px;text-align:center;font-size:10px;color:var(--sub);font-weight:400;font-variant-numeric:tabular-nums}
 .pg-cell{width:var(--pg-cell);height:var(--pg-cell);border-radius:2.5px;background:#f0eee8;color:#b3afa6;font-size:calc(var(--pg-cell)*.42);line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .15s;user-select:none;font-weight:500;letter-spacing:-.2px}
 .pg-cell:hover{transform:scale(1.4);position:relative;z-index:5;background:#e8e4da;color:var(--text)}
 .pg-cell.on{background:linear-gradient(135deg,#f7b6c8,#ef9ab3);color:#fff;font-weight:600;box-shadow:0 1px 2px rgba(214,105,135,.4)}
@@ -177,7 +195,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 <div data-page-node-id="C1zOBKhALYhUsTO14KhY6p" class="btn-row"><button data-page-node-id="no44JoCx3a5gbaixmopIjW" class="btn" onclick="showHistory('stall')"><!--pnid:RjEn8sl9kiLQLRxzkuAlBx-->🔍 查询往月</button></div>
 <div data-page-node-id="j84dxjPmcFUeyCxhCpBCwI" class="card goal-card"><div data-page-node-id="VTqLpUWRwVhDCdX2UIn386" style="font-weight:600; margin-bottom:12px"><!--pnid:eMQcvpoD02nJFb88WIlVjU-->本月摆摊目标完成情况</div><div data-page-node-id="KAgIFy8GSAGoCYaijdF47g" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:10px"><div data-page-node-id="wDuA3qHDDDdK0sZHuSYVHo"><div data-page-node-id="CB7Tuj66FoDaCy0W6zks7G" class="card-label"><!--pnid:5kN7vnoizrOChosL9cLG9R-->已完成</div><div data-page-node-id="9A8iqiQU0Zd2AWYKG70Vp5" class="card-big small" id="st-done"><!--pnid:l8hK0t0LHvR75tUicEd0Pl-->0.00</div></div><div data-page-node-id="Pm6Qt0Amya5K5U1xJ1sCMf"><div data-page-node-id="nH1zti99odHSbARoUifYaN" class="card-label"><!--pnid:OXLBylrMer2LZtEPyR8pHO-->目标</div><div data-page-node-id="8OzzicVfiT3gxA3J7NB2Mu" class="card-big small" id="st-target"><!--pnid:x9X39hyrlYrUblX6QJlQNy-->0.00</div></div><div data-page-node-id="oItHe3HVMZUEYBwXV280Gh"><div data-page-node-id="VHT0jjUl5oDKo9josRQ0ti" class="card-label"><!--pnid:MTAcKffW3yisjQ4ojpjlI7-->差额</div><div data-page-node-id="kT1HgPg41tNzLwMDXG7tWw" class="card-big small" id="st-diff"><!--pnid:XqwRxjBnb9MnhJoU00dbxs-->0.00</div></div></div><div data-page-node-id="m9sflOWVKo6WqYqL0mA0bD" class="progress"><div data-page-node-id="hoU6Cr1xtP4GUWE9e9xVgA" class="progress-fill" id="st-progress" style="width:0%"></div></div><div data-page-node-id="WOLFZM9GG2Xv8tEzkbQNMT" id="st-percent" style="text-align:right; font-size:12px; color:var(--accent); margin-top:6px"><!--pnid:gQg70mZFkW6cgeJBGrVeOa-->0%</div></div>
 <div data-page-node-id="e4xAVWEypsts4YYprvbd5C" class="card-row"><div data-page-node-id="2nz3WfV84Wne2kmnN3pvZM" class="card-mini"><div data-page-node-id="qilTxBt58DHl9h9Tt2lWog" class="card-label"><!--pnid:iGxLOGpQWKgD0VAwvZuiUE-->📱 今日线上收入</div><div data-page-node-id="3L2MtnYShnGf524S2Rv37l" class="card-big small" id="st-online-today"><!--pnid:HiS8nqumT53uMWYchsvsJb-->0.00 元</div><div data-page-node-id="NHCEXFuDI3krRImzbWDZVD" class="card-sub" id="st-online-count"><!--pnid:zj5cx8gX0eLcSUxyl9SF2J-->0 笔</div></div><div data-page-node-id="BJl9xQBdAEHWrSShEcQKUb" class="card-mini"><div data-page-node-id="due3rLAbmL9xhJ9b7LoKee" class="card-label"><!--pnid:K9WecYuuf2nVtj7uBZAX1z-->🏪 今日线下收入</div><div data-page-node-id="Fjv0hGAGpLTmFgnmUkaDDH" class="card-big small" id="st-offline-today"><!--pnid:BYhWCq9HTE96Dg5WoIr9tT-->0.00 元</div><div data-page-node-id="IPLFL9fZDC1iQgLEJpyi6v" class="card-sub" id="st-offline-count"><!--pnid:OpGUkcK9316Qn8TISM9gH2-->0 笔</div></div></div>
-<div data-page-node-id="63rAjdBINzsRUx2ttpz6Pk" class="card" style="background:linear-gradient(135deg,#fce4d2,#fbe2c8)"><div data-page-node-id="EIt1BkHxH53hvb625yrFYC" style="display:flex; justify-content:space-between; align-items:center"><div data-page-node-id="PUP3DhPqbnaQOdwwFkBvf6"><div data-page-node-id="bh2NSmIfuIx2dIxbqMHQZY" style="font-weight:600"><!--pnid:nEbWILRn3xfT07gKTg3YBS-->本月总收入</div><div data-page-node-id="fmfglPrUUQk1EfeJPRhnGU" id="st-percent-detail" style="font-size:11px; color:#a06a3e; margin-top:4px"><!--pnid:0iQUvidK8ClxKSlyKZ0U7J-->线上 0% · 线下 0%</div></div><div data-page-node-id="Ve2z2S6UzbDBu5OoFOMtYt" id="st-total" style="font-size:24px; font-weight:700; color:#7a4a25"><!--pnid:xGsciuA0mYWtJsUdiRE0EN-->0.00 元</div></div></div>
+<div data-page-node-id="63rAjdBINzsRUx2ttpz6Pk" class="card" style="background:linear-gradient(135deg,#fce4d2,#fbe2c8)"><div data-page-node-id="EIt1BkHxH53hvb625yrFYC" style="display:flex; justify-content:space-between; align-items:center"><div data-page-node-id="PUP3DhPqbnaQOdwwFkBvf6"><div data-page-node-id="bh2NSmIfuIx2dIxbqMHQZY" style="font-weight:600"><!--pnid:nEbWILRn3xfT07gKTg3YBS-->本月总收入</div><div data-page-node-id="fmfglPrUUQk1EfeJPRhnGU" id="st-percent-detail" style="font-size:11px; color:#a06a3e; margin-top:4px"><!--pnid:0iQUvidK8ClxKSlyKZ0U7J-->线上 0% · 线下 0%</div></div><div data-page-node-id="Ve2z2S6UzbDBu5OoFOMtYt" id="st-total" style="font-size:24px; font-weight:700; color:#7a4a25"><!--pnid:xGsciuA0mYWtJsUdiRE0EN-->0.00 元</div></div><div class="st-pie-row"><div class="st-pie-box"><canvas id="pieStallOnline" width="140" height="140"></canvas></div><div class="st-pie-lg" id="st-onoff-legend"></div></div></div>
 <div data-page-node-id="ZLhVJMUadJci9yTmLWgulF" class="card pie-card"><div data-page-node-id="A8ZwSPvhataKwBNtLVl0VR" style="font-weight:600; margin-bottom:10px; text-align:left"><!--pnid:BmAE57p3N4X3HeVjrPQ8Ep-->📊 线上收入分类占比</div><div data-page-node-id="NYX67ep5RyS8mz8mNlyPJV" class="pie-wrap"><canvas data-page-node-id="nNwyZPRKamaU2ynVWWZItm" height="140" id="pieStall" width="140"></canvas><div data-page-node-id="y6mF0U3JZdrJviS0PxiRhn" class="pie-legend" id="st-legend"></div></div></div>
 <div data-page-node-id="tt2sqCO2ZVIBOudzGiHxmY" class="card-row"><div data-page-node-id="9tbJVLYG1HkDJwuia3dQKg" class="card-mini"><div data-page-node-id="rCE5OfidTrlyshM6iWmT75" class="card-label"><!--pnid:CR5f5u1a393L8o9qtlzTMQ-->本月成本支出</div><div data-page-node-id="E9BM8EDzPse14jHKJRzO8E" class="card-big small" id="st-cost"><!--pnid:IPh7ipJLMtvwhYhNGFt4H2-->0.00 元</div></div><div data-page-node-id="utFjVgLVTJuw6Bm5vXGKV8" class="card-mini"><div data-page-node-id="FQ8B96gKeykPjwgNzn35lA" class="card-label"><!--pnid:F9bw8GlwMhwnw2AXBc1IuT-->本月利润</div><div data-page-node-id="azNHnCXM5JpyclwiJjaxF9" class="card-big small" id="st-profit" style="color:var(--green)"><!--pnid:Ksuc1svgz7wM1y6x8qL1r7-->0.00</div></div></div>
 <div data-page-node-id="Fk9HtLma3Z2ExNdFmTTh4K" class="section-title"><!--pnid:h2RMlNhV6SfGiJg6KZPEF5-->收支记录</div><div data-page-node-id="WGgzhNO0XaZvHDGyYws26n" id="st-list" style="display:flex; flex-direction:column; width:100%"></div>
@@ -210,7 +228,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 <div data-page-node-id="VukAbaAHCGbOtmTcbUZ162" class="page-date" id="pg-date"></div>
 <div data-page-node-id="p2AY4kdhrKQmWApNK5xe0n" class="btn-row"><button data-page-node-id="8lSr6jzmEyHXYVcFo6IkPe" class="btn" onclick="pgAdd()"><!--pnid:F40w3IY7dxEdbOhPAAoILv-->💗 存入</button><button data-page-node-id="slS9atcblA2rA4utFmdDWN" class="btn" onclick="pgSettings()"><!--pnid:fKRi9raGh1OYHad1SA2tiA-->⚙️ 设置</button></div>
 <div data-page-node-id="idOAJbbJKLln2fxVMiz9v2" class="card"><div data-page-node-id="aV9q767dnij4NFQuapjo6s" style="display:flex; justify-content:space-between; font-size:12px; color:var(--sub); margin-bottom:6px"><span data-page-node-id="7lsx7aOhQYZLRKoS8kFEyb"><!--pnid:2iQkEp1SbTqhAXOLL3eGNc-->已点亮 <b data-page-node-id="fLKHBNlDY5V8WLUaRhR1jL" id="pg-lit-count" style="color:#d4718b"><!--pnid:3XPKVuhXXmd2yFhDJAF1Sd-->0 / 379</b><!--pnid:mx8ZLpNEKqWy13g9plYsoN--> 格</span><span data-page-node-id="PHPxh4XOPCIUerW1wRwPS8" id="pg-pct"><!--pnid:qKy7BBDQ2ZkOGz1VGoFWnG-->0.0%</span></div><div data-page-node-id="S7eCuBNfhom4hnpKnqV4IM" class="progress"><div data-page-node-id="9OsBc8rCgPnwXZwLRCbMiz" class="progress-fill" id="pg-progress" style="width:0%; background:linear-gradient(90deg,#f7b6c8,#e78ba6)"></div></div></div>
-<div data-page-node-id="7ijvDIkUrkxmDZhtzawkhD" class="card" style="padding:8px 6px"><div data-page-node-id="iQvEuWg867sGvPgwWQJ3JL" style="font-weight:600; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; padding:0 4px"><span data-page-node-id="WkK1fAMkBMmPWFe3QItNoc"><!--pnid:zxlTfPekMubbd47bg8n2oc-->💗 爱心存钱打卡</span><span data-page-node-id="8KzGftjPyyFD3NaJqTg9xe" style="font-size:10px; color:var(--sub); font-weight:400"><!--pnid:9TfOGUPNicwaSpSKGVdypw-->点击格子可存入</span></div><div data-page-node-id="lN0CEQIeCwMFZoXZW5xYPs" class="pg-heart" id="pg-heart"></div><div data-page-node-id="DorehbAtWXTn2Uz1W37zjk" style="display:flex; justify-content:center; gap:16px; margin-top:10px; font-size:10px; color:var(--sub)"><span data-page-node-id="u7MQGikTXgqiM0kuXAEp5W"><i data-page-node-id="FXfmN9dnWfQJyFRjF8z8go" class="pg-demo-dot" style="background:linear-gradient(135deg,#f7b6c8,#ef9ab3)"></i><!--pnid:PeYN9KpgUGe4uJfYOwLzik-->已存入</span><span data-page-node-id="ruSkWUzHSxDIuJFYYpdGdS"><i data-page-node-id="STiw5N5qmzIFzQRwfuOpDN" class="pg-demo-dot" style="background:#f0eee8; border:1px solid #e4e2da"></i><!--pnid:Q8mRRNNpdKGYpnCRk3Fn4g-->待点亮</span></div></div>
+<div data-page-node-id="7ijvDIkUrkxmDZhtzawkhD" class="card" style="padding:8px 6px"><div data-page-node-id="iQvEuWg867sGvPgwWQJ3JL" style="font-weight:600; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; padding:0 4px"><span data-page-node-id="WkK1fAMkBMmPWFe3QItNoc"><!--pnid:zxlTfPekMubbd47bg8n2oc-->💗 爱心存钱打卡</span><span data-page-node-id="8KzGftjPyyFD3NaJqTg9xe" class="pg-zbar" style="font-size:10px; color:var(--sub); font-weight:400"><!--pnid:9TfOGUPNicwaSpSKGVdypw--><button class="pg-zbtn" id="pg-z-out" onclick="pgZoomStep(-1)" aria-label="缩小">−</button><span class="pg-zval" id="pg-zval">1.0×</span><button class="pg-zbtn" id="pg-z-in" onclick="pgZoomStep(1)" aria-label="放大">＋</button><button class="pg-zbtn" id="pg-z-reset" style="display:none" onclick="pgZoomReset()">复位</button></span></div><div class="pg-viewport" id="pg-viewport"><div data-page-node-id="lN0CEQIeCwMFZoXZW5xYPs" class="pg-heart" id="pg-heart"></div></div><div data-page-node-id="DorehbAtWXTn2Uz1W37zjk" style="display:flex; justify-content:center; gap:16px; margin-top:10px; font-size:10px; color:var(--sub)"><span data-page-node-id="u7MQGikTXgqiM0kuXAEp5W"><i data-page-node-id="FXfmN9dnWfQJyFRjF8z8go" class="pg-demo-dot" style="background:linear-gradient(135deg,#f7b6c8,#ef9ab3)"></i><!--pnid:PeYN9KpgUGe4uJfYOwLzik-->已存入</span><span data-page-node-id="ruSkWUzHSxDIuJFYYpdGdS"><i data-page-node-id="STiw5N5qmzIFzQRwfuOpDN" class="pg-demo-dot" style="background:#f0eee8; border:1px solid #e4e2da"></i><!--pnid:Q8mRRNNpdKGYpnCRk3Fn4g-->待点亮</span><span id="pg-tip" style="color:#c9c5bc">· 双指张开放大，捏合恢复</span></div></div>
 <div data-page-node-id="Cfd9SEb079ZWvstR6sEbaQ" class="card-row"><div data-page-node-id="FHwn508jiLWbBnUe8G9gtX" class="card-mini"><div data-page-node-id="5B34zQcZC9KHjXcoViT6a7" class="card-label"><span data-page-node-id="wE5Gjz8pAWwtKzPZrYUrcq" class="tag tag-pink"><!--pnid:hjueJ8TEhCmWiNeG5sKArj-->总存入</span><!--pnid:FDleqnOE14aZOpq8D725d4-->金额</div><div data-page-node-id="fvTlPQr4D4awSasjWxG79f" class="card-big" id="pg-total"><!--pnid:5v5Q0GGyFXXwsXjhLa7y3L-->0.00 元</div><div data-page-node-id="BYCWEXICyV9mZGdjgm08gw" class="card-sub"><!--pnid:5ij3hJVMrrCTLt04nP6o3s-->累计存入金额</div></div><div data-page-node-id="XtWysagyS5j1rOIAJTVavY" class="card-mini"><div data-page-node-id="OXKcPk9HDavF51fm9Q5YUR" class="card-label"><span data-page-node-id="kr41NBRWNqZJTfGMWUge8l" class="tag tag-green"><!--pnid:K3wgmrQ9dG6t0XqMQcIZJq-->已存钱</span><!--pnid:2oxCVPHQ9JJ6B8bklHvjib-->天数</div><div data-page-node-id="911MYiq0IXDJgQEe0ZS9qS" class="card-big" id="pg-days"><!--pnid:P7JNbEq7yEgvZ3MnMamNjW-->0 天</div><div data-page-node-id="YGTvu7JzBYbwHYaO8GVHGr" class="card-sub" id="pg-days-sub"><!--pnid:kJBd5A3nAEnhj616LnIdN0-->尚无存入记录</div></div></div>
 <div data-page-node-id="p4nINgviXViGnWiiKhgkVo" class="section-title"><!--pnid:bYKaZ3cLN4X027dXL5Swvj-->存入记录</div>
 <div data-page-node-id="jpOzfJSEP63shNSqZJbQNN" id="pg-list" style="display:flex; flex-direction:column; width:100%"></div>
@@ -389,7 +407,18 @@ function addIncome(){openModal('<div class="modal-title">记录收入 / 支出</
 function toggleStallFields(){const t=document.getElementById('m-type').value;document.getElementById('m-channel-group').style.display=t==='income'?'block':'none'}
 async function saveIncome(){const type=document.getElementById('m-type').value;const amt=Number(document.getElementById('m-amt').value);if(!amt||amt<=0)return showToast('请输入金额');const channel=document.getElementById('m-channel').value;const note=document.getElementById('m-note').value;const date=document.getElementById('m-date').value||ymd();D.stall.records.push({type,channel,note,amt,date});save();closeModal();showToast('已记录')}
 let pieStallObj=null;
-function renderStall(){const st=D.stall;const rec=st.records||[];const monthRec=rec.filter(r=>r.date.startsWith(ym()));const incomes=monthRec.filter(r=>r.type==='income'||r.type==='offline');const costs=monthRec.filter(r=>r.type==='cost');const totalIncome=incomes.reduce((s,r)=>s+r.amt,0);const totalCost=costs.reduce((s,r)=>s+r.amt,0);const profit=totalIncome-totalCost;const online=monthRec.filter(r=>r.type==='income').reduce((s,r)=>s+r.amt,0);const offline=monthRec.filter(r=>r.type==='offline').reduce((s,r)=>s+r.amt,0);const done=totalIncome;const target=st.monthlyGoal||0;const diff=target-done;const pct=target>0?Math.min(100,done/target*100):0;document.getElementById('st-date').textContent=today.getFullYear()+'年'+(today.getMonth()+1)+'月'+today.getDate()+'日 星期'+'日一二三四五六'[today.getDay()];document.getElementById('st-done').textContent=fmt(done);document.getElementById('st-target').textContent=fmt(target);document.getElementById('st-diff').textContent=fmt(diff);document.getElementById('st-progress').style.width=pct+'%';document.getElementById('st-percent').textContent=pct.toFixed(1)+'%';const todayRec=rec.filter(r=>r.date===ymd());const todayOnline=todayRec.filter(r=>r.type==='income').reduce((s,r)=>s+r.amt,0);const todayOffline=todayRec.filter(r=>r.type==='offline').reduce((s,r)=>s+r.amt,0);document.getElementById('st-online-today').textContent=fmt(todayOnline)+' 元';document.getElementById('st-offline-today').textContent=fmt(todayOffline)+' 元';document.getElementById('st-online-count').textContent=todayRec.filter(r=>r.type==='income').length+' 笔';document.getElementById('st-offline-count').textContent=todayRec.filter(r=>r.type==='offline').length+' 笔';document.getElementById('st-total').textContent=fmt(totalIncome)+' 元';const onlinePct=totalIncome>0?Math.round(online/totalIncome*100):0;document.getElementById('st-percent-detail').textContent='线上 '+onlinePct+'% · 线下 '+(totalIncome>0?100-onlinePct:0)+'%';const channelMap={};monthRec.filter(r=>r.type==='income').forEach(r=>{channelMap[r.channel]=(channelMap[r.channel]||0)+r.amt});const labels=Object.keys(channelMap);const data=labels.map(l=>channelMap[l]);const colors=['#e9c465','#d99fb0','#7ba7d9','#6cc28b','#f5a04e','#b88fd9','#5fb4b4'];const ctx=document.getElementById('pieStall');if(pieStallObj)pieStallObj.destroy();if(labels.length){pieStallObj=new Chart(ctx,{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors.slice(0,labels.length),borderWidth:0}]},options:{cutout:'60%',plugins:{legend:{display:false}}}})}else{ctx.getContext('2d').clearRect(0,0,200,200)}const legendHtml=labels.length?labels.map((l,i)=>'<div class="pie-legend-item"><div class="pie-dot" style="background:'+colors[i]+'"></div>'+l+'<span class="pie-amt">'+channelMap[l]+' ('+(channelMap[l]/(online||1)*100).toFixed(0)+'%)</span></div>').join(''):'<div class="empty">暂无数据</div>';document.getElementById('st-legend').innerHTML=legendHtml;document.getElementById('st-cost').textContent=fmt(totalCost)+' 元';document.getElementById('st-profit').textContent=fmt(profit);const sorted=rec.slice().reverse();const html=sorted.length?sorted.map((r,ri)=>{const i=rec.length-1-ri;let label='',amtClass='',sign='';if(r.type==='income'){label='线上 · '+r.channel;amtClass='pos';sign='+'}else if(r.type==='offline'){label='线下 · '+(r.channel||'收入');amtClass='pos';sign='+'}else{label='成本支出'+(r.note?' · '+r.note:'');amtClass='neg';sign='-'}return '<div class="record"><div class="record-left"><div class="record-icon">'+(r.type==='cost'?'💸':(r.type==='offline'?'🏪':'📱'))+'</div><div class="record-info"><div class="r1">'+label+'</div><div class="r2">'+r.date+'</div></div></div><div style="display:flex;align-items:center"><div class="record-amt '+amtClass+'">'+sign+fmt(r.amt)+'</div><button class="record-del" onclick="delStall('+i+')">×</button></div></div>'}).join(''):'<div class="empty">还没有摆摊记录</div>';document.getElementById('st-list').innerHTML=html}
+let pieOnlineObj=null;
+function renderStall(){const st=D.stall;const rec=st.records||[];const monthRec=rec.filter(r=>r.date.startsWith(ym()));const incomes=monthRec.filter(r=>r.type==='income'||r.type==='offline');const costs=monthRec.filter(r=>r.type==='cost');const totalIncome=incomes.reduce((s,r)=>s+r.amt,0);const totalCost=costs.reduce((s,r)=>s+r.amt,0);const profit=totalIncome-totalCost;const online=monthRec.filter(r=>r.type==='income').reduce((s,r)=>s+r.amt,0);const offline=monthRec.filter(r=>r.type==='offline').reduce((s,r)=>s+r.amt,0);const done=totalIncome;const target=st.monthlyGoal||0;const diff=target-done;const pct=target>0?Math.min(100,done/target*100):0;document.getElementById('st-date').textContent=today.getFullYear()+'年'+(today.getMonth()+1)+'月'+today.getDate()+'日 星期'+'日一二三四五六'[today.getDay()];document.getElementById('st-done').textContent=fmt(done);document.getElementById('st-target').textContent=fmt(target);document.getElementById('st-diff').textContent=fmt(diff);document.getElementById('st-progress').style.width=pct+'%';document.getElementById('st-percent').textContent=pct.toFixed(1)+'%';const todayRec=rec.filter(r=>r.date===ymd());const todayOnline=todayRec.filter(r=>r.type==='income').reduce((s,r)=>s+r.amt,0);const todayOffline=todayRec.filter(r=>r.type==='offline').reduce((s,r)=>s+r.amt,0);document.getElementById('st-online-today').textContent=fmt(todayOnline)+' 元';document.getElementById('st-offline-today').textContent=fmt(todayOffline)+' 元';document.getElementById('st-online-count').textContent=todayRec.filter(r=>r.type==='income').length+' 笔';document.getElementById('st-offline-count').textContent=todayRec.filter(r=>r.type==='offline').length+' 笔';document.getElementById('st-total').textContent=fmt(totalIncome)+' 元';const onlinePct=totalIncome>0?Math.round(online/totalIncome*100):0;document.getElementById('st-percent-detail').textContent='线上 '+onlinePct+'% · 线下 '+(totalIncome>0?100-onlinePct:0)+'%';
+const onPct=totalIncome>0?online/totalIncome*100:0;const offPct=totalIncome>0?offline/totalIncome*100:0;
+const ctxOL=document.getElementById('pieStallOnline');
+if(ctxOL){
+  if(pieOnlineObj)pieOnlineObj.destroy();
+  const hasOL=totalIncome>0;
+  pieOnlineObj=new Chart(ctxOL,{type:'doughnut',data:{labels:['线上','线下'],datasets:[{data:hasOL?[online,offline]:[1],backgroundColor:hasOL?['#f5a04e','#7ba7d9']:['#eed6bd'],borderWidth:0}]},options:{cutout:'60%',responsive:true,maintainAspectRatio:true,animation:{duration:400},plugins:{legend:{display:false},tooltip:{enabled:hasOL,callbacks:{label:function(c){return c.label+' '+fmt(c.parsed)+' 元 ('+(c.parsed/totalIncome*100).toFixed(1)+'%)'}}}}}});
+}
+const lgOL=document.getElementById('st-onoff-legend');
+if(lgOL)lgOL.innerHTML='<div><div class="st-pie-lg-item"><i class="pie-dot" style="background:#f5a04e"></i><span class="st-pie-lg-name">线上</span><span class="st-pie-lg-pct">'+onPct.toFixed(1)+'%</span></div><div class="st-pie-lg-amt">'+fmt(online)+' 元</div></div>'
++'<div><div class="st-pie-lg-item"><i class="pie-dot" style="background:#7ba7d9"></i><span class="st-pie-lg-name">线下</span><span class="st-pie-lg-pct">'+offPct.toFixed(1)+'%</span></div><div class="st-pie-lg-amt">'+fmt(offline)+' 元</div></div>';const channelMap={};monthRec.filter(r=>r.type==='income').forEach(r=>{channelMap[r.channel]=(channelMap[r.channel]||0)+r.amt});const labels=Object.keys(channelMap);const data=labels.map(l=>channelMap[l]);const colors=['#e9c465','#d99fb0','#7ba7d9','#6cc28b','#f5a04e','#b88fd9','#5fb4b4'];const ctx=document.getElementById('pieStall');if(pieStallObj)pieStallObj.destroy();if(labels.length){pieStallObj=new Chart(ctx,{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors.slice(0,labels.length),borderWidth:0}]},options:{cutout:'60%',plugins:{legend:{display:false}}}})}else{ctx.getContext('2d').clearRect(0,0,200,200)}const legendHtml=labels.length?labels.map((l,i)=>'<div class="pie-legend-item"><div class="pie-dot" style="background:'+colors[i]+'"></div>'+l+'<span class="pie-amt">'+channelMap[l]+' ('+(channelMap[l]/(online||1)*100).toFixed(0)+'%)</span></div>').join(''):'<div class="empty">暂无数据</div>';document.getElementById('st-legend').innerHTML=legendHtml;document.getElementById('st-cost').textContent=fmt(totalCost)+' 元';document.getElementById('st-profit').textContent=fmt(profit);const sorted=rec.slice().reverse();const html=sorted.length?sorted.map((r,ri)=>{const i=rec.length-1-ri;let label='',amtClass='',sign='';if(r.type==='income'){label='线上 · '+r.channel;amtClass='pos';sign='+'}else if(r.type==='offline'){label='线下 · '+(r.channel||'收入');amtClass='pos';sign='+'}else{label='成本支出'+(r.note?' · '+r.note:'');amtClass='neg';sign='-'}return '<div class="record"><div class="record-left"><div class="record-icon">'+(r.type==='cost'?'💸':(r.type==='offline'?'🏪':'📱'))+'</div><div class="record-info"><div class="r1">'+label+'</div><div class="r2">'+r.date+'</div></div></div><div style="display:flex;align-items:center"><div class="record-amt '+amtClass+'">'+sign+fmt(r.amt)+'</div><button class="record-del" onclick="delStall('+i+')">×</button></div></div>'}).join(''):'<div class="empty">还没有摆摊记录</div>';document.getElementById('st-list').innerHTML=html}
 async function delStall(i){D.stall.records.splice(i,1);await save()}
 function setSavingGoal(){openModal('<div class="modal-title">设置存钱目标</div><div class="form-group"><label class="form-label">总目标（元）</label><input type="number" class="form-input" id="m-sv-goal" value="'+(D.saving.goal||0)+'"></div><div class="form-group"><label class="form-label">开始日期</label><input type="date" class="form-input" id="m-sv-start" value="'+(D.saving.start||ymd())+'"></div><div class="form-group"><label class="form-label">截止日期</label><input type="date" class="form-input" id="m-sv-end" value="'+(D.saving.end||'')+'"></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">取消</button><button class="btn-ok" onclick="saveSavingGoal()">确认</button></div>')}
 async function saveSavingGoal(){D.saving.goal=Number(document.getElementById('m-sv-goal').value)||0;D.saving.start=document.getElementById('m-sv-start').value;D.saving.end=document.getElementById('m-sv-end').value;await save();closeModal();showToast('已保存')}
@@ -434,15 +463,89 @@ function doHistory(t){const m=document.getElementById('h-month').value;let html=
 const PG_LAYOUT=[[[5,6],[12,6]],[[4,15]],[[3,17]],[[2,19]],[[1,21]],[[1,21]],[[0,23]],[[0,23]],[[0,23]],[[0,23]],[[1,21]],[[1,21]],[[1,21]],[[2,19]],[[2,19]],[[3,17]],[[4,15]],[[5,13]],[[6,11]],[[7,9]],[[8,7]],[[9,5]],[[10,3]],[[11,1]]];
 const PG_TOTAL=PG_LAYOUT.reduce((s,r)=>s+r.reduce((a,x)=>a+x[1],0),0);
 const PG_COLS=23;
-function pgFitCell(){
-  const h=document.getElementById('pg-heart');
-  if(!h)return;
-  const w=h.clientWidth;
-  if(w>0){
-    const cell=Math.min(14,Math.floor((w-(PG_COLS-1))/PG_COLS*10)/10);
-    h.style.setProperty('--pg-cell',cell+'px');
-  }
+/* ====== 爱心缩放：双指张开放大 / 捏合恢复 ====== */
+const PG_ZOOM_MAX=4,PG_ZOOM_SNAP=1.15;
+let pgZoom=1,pgBaseCell=12,pgGesture=null,pgGestureEnd=0,pgAnim=0;
+function pgEl(id){return document.getElementById(id)}
+function pgMeasureBase(){
+  const vp=pgEl('pg-viewport');if(!vp)return 12;
+  const card=vp.parentElement;let w=0;
+  if(card){const cs=getComputedStyle(card);w=card.clientWidth-(parseFloat(cs.paddingLeft)||0)-(parseFloat(cs.paddingRight)||0)}
+  if(!w)w=vp.clientWidth;
+  if(!w)return 12;
+  const base=Math.min(14,Math.floor((w-(PG_COLS-1))/PG_COLS*10)/10);
+  return base>2?base:12;
 }
+function pgApplyZoom(){
+  const h=pgEl('pg-heart');if(!h)return;
+  h.style.setProperty('--pg-cell',Math.max(3,+(pgBaseCell*pgZoom).toFixed(2))+'px');
+  const val=pgEl('pg-zval');if(val)val.textContent=pgZoom.toFixed(1)+'×';
+  const rst=pgEl('pg-z-reset');if(rst)rst.style.display=pgZoom>1.01?'flex':'none';
+  const out=pgEl('pg-z-out');if(out)out.style.opacity=pgZoom>1.01?'1':'.45';
+  const inn=pgEl('pg-z-in');if(inn)inn.style.opacity=pgZoom<PG_ZOOM_MAX-0.01?'1':'.45';
+  const vp=pgEl('pg-viewport');if(vp)vp.classList.toggle('zoomed',pgZoom>1.01);
+}
+function pgFitCell(){pgBaseCell=pgMeasureBase();pgApplyZoom()}
+function pgSetZoom(z){
+  z=Math.min(PG_ZOOM_MAX,Math.max(1,z));
+  if(pgAnim){cancelAnimationFrame(pgAnim);pgAnim=0}
+  pgZoom=z;pgApplyZoom();
+}
+function pgAnimateZoom(target){
+  if(pgAnim)cancelAnimationFrame(pgAnim);
+  const from=pgZoom,t0=performance.now(),dur=220;
+  function step(now){
+    const t=Math.min(1,(now-t0)/dur),e=1-Math.pow(1-t,3);
+    pgZoom=from+(target-from)*e;pgApplyZoom();
+    if(t<1)pgAnim=requestAnimationFrame(step);
+    else{pgAnim=0;pgZoom=target;pgApplyZoom()}
+  }
+  pgAnim=requestAnimationFrame(step);
+}
+function pgSmoothSetZoom(z){z=Math.min(PG_ZOOM_MAX,Math.max(1,z));pgAnimateZoom(z)}
+function pgZoomStep(d){
+  if(pgAnim){cancelAnimationFrame(pgAnim);pgAnim=0}
+  const step=Math.max(0.3,pgZoom*0.3);
+  pgSmoothSetZoom(pgZoom+(d>0?step:-step));
+}
+function pgZoomReset(){pgSmoothSetZoom(1);if(window.showToast)showToast('已恢复原始大小')}
+function pgPinchDist(t){const dx=t[0].clientX-t[1].clientX,dy=t[0].clientY-t[1].clientY;return Math.sqrt(dx*dx+dy*dy)||1}
+function pgTouchStart(e){
+  if(e.touches.length!==2)return;
+  if(pgAnim){cancelAnimationFrame(pgAnim);pgAnim=0}
+  pgGesture={d0:pgPinchDist(e.touches),z0:pgZoom,moved:false};
+  const vp=pgEl('pg-viewport');if(vp)vp.classList.add('zooming');
+}
+function pgTouchMove(e){
+  if(!pgGesture||e.touches.length!==2)return;
+  const next=Math.min(PG_ZOOM_MAX,Math.max(0.5,pgGesture.z0*(pgPinchDist(e.touches)/pgGesture.d0)));
+  if(Math.abs(next-pgZoom)>0.004){pgGesture.moved=true;pgZoom=next;pgApplyZoom()}
+  if(e.cancelable)e.preventDefault();
+  e.stopPropagation();
+}
+function pgTouchEnd(){
+  if(!pgGesture)return;
+  const moved=pgGesture.moved;pgGesture=null;
+  const vp=pgEl('pg-viewport');if(vp)vp.classList.remove('zooming');
+  if(!moved)return;
+  pgGestureEnd=Date.now();
+  if(pgZoom<PG_ZOOM_SNAP){pgSmoothSetZoom(1)}
+  else{pgSetZoom(Math.round(pgZoom*20)/20)}
+}
+function pgJustZoomed(){return Date.now()-pgGestureEnd<350}
+(function(){
+  const vp=pgEl('pg-viewport');if(!vp)return;
+  vp.addEventListener('touchstart',pgTouchStart,{passive:true});
+  vp.addEventListener('touchmove',pgTouchMove,{passive:false});
+  vp.addEventListener('touchend',pgTouchEnd,{passive:true});
+  vp.addEventListener('touchcancel',pgTouchEnd,{passive:true});
+  vp.addEventListener('wheel',function(e){
+    if(!e.ctrlKey&&!e.metaKey)return;
+    if(e.cancelable)e.preventDefault();
+    if(pgAnim){cancelAnimationFrame(pgAnim);pgAnim=0}
+    pgSetZoom(pgZoom*(e.deltaY<0?1.12:1/1.12));
+  },{passive:false});
+})();
 let pgPrevLit=null;
 function pgData(){if(!D.piggy)D.piggy={start:0.2,step:0.2,records:[]};if(!D.piggy.records)D.piggy.records=[];if(!(D.piggy.start>0))D.piggy.start=0.2;if(!(D.piggy.step>0))D.piggy.step=0.2;return D.piggy}
 function pgCellAmt(i){const pg=pgData();return +(pg.start+(i-1)*pg.step).toFixed(2)}
@@ -498,6 +601,7 @@ async function pgSaveAdd(){
   await save();closeModal();showToast('已点亮第 '+cell+' 格 · '+pgNumLabel(num)+' 元 ❤');
 }
 function pgClickCell(i){
+  if(pgJustZoomed())return;
   const lit=pgLitSet();
   if(lit.has(i)){
     const recs=pgData().records.filter(r=>r.cell===i);
