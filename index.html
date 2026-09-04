@@ -273,35 +273,39 @@ document.getElementById('pwd-input').addEventListener('keydown', (e) => {
 if (pwdSession) {
   document.getElementById('login').style.display = 'none';
   document.getElementById('app').style.display = 'flex';
+  // 关键：自动登录时同样要加载数据；延后一拍执行，等脚本里的 D 等变量声明完成
+  setTimeout(initApp, 0);
 }
 
 // ====== Cloud Sync ======
+let lastSyncErr = '';
 async function cloudLoad() {
   try {
     setSyncStatus('syncing');
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/app_data?id=eq.${DATA_ID}`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/app_data?id=eq.${DATA_ID}&select=data,updated_at`, {
       headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
     });
+    if (!res.ok) { lastSyncErr = 'HTTP ' + res.status; setSyncStatus('error'); return { data: null, at: 0, err: 'HTTP ' + res.status }; }
     const arr = await res.json();
-    setSyncStatus('done');
+    setSyncStatus('done'); lastSyncErr = '';
     if (arr && arr.length > 0 && arr[0].data) {
-      return arr[0].data;
+      return { data: arr[0].data, at: Date.parse(arr[0].updated_at) || 0, err: null };
     }
-    return null;
+    return { data: null, at: 0, err: null };
   } catch (e) {
-    setSyncStatus('error');
-    return null;
+    lastSyncErr = 'network'; setSyncStatus('error');
+    return { data: null, at: 0, err: 'network' };
   }
 }
 
 let saveTimer = null;
 async function cloudSave(data) {
-  if (!data || Object.keys(data).length === 0) { return false; }
-  if (!data.bookkeeping && !data.stall && !data.saving && !data.debt && !data.piggy) { return false; }
+  if (!data || Object.keys(data).length === 0) { return { ok: false, at: 0, err: 'empty' }; }
+  if (!data.bookkeeping && !data.stall && !data.saving && !data.debt && !data.piggy) { return { ok: false, at: 0, err: 'empty' }; }
   clearTimeout(saveTimer);
   setSyncStatus('syncing');
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/app_data?id=eq.${DATA_ID}`, {
+    let res = await fetch(`${SUPABASE_URL}/rest/v1/app_data?id=eq.${DATA_ID}`, {
       method: 'POST',
       headers: {
         'apikey': SUPABASE_KEY,
@@ -312,7 +316,7 @@ async function cloudSave(data) {
       body: JSON.stringify({ id: DATA_ID, data, updated_at: new Date().toISOString() })
     });
     if (!res.ok) {
-      const res2 = await fetch(`${SUPABASE_URL}/rest/v1/app_data?id=eq.${DATA_ID}`, {
+      res = await fetch(`${SUPABASE_URL}/rest/v1/app_data?id=eq.${DATA_ID}`, {
         method: 'PATCH',
         headers: {
           'apikey': SUPABASE_KEY,
@@ -322,11 +326,19 @@ async function cloudSave(data) {
         body: JSON.stringify({ data, updated_at: new Date().toISOString() })
       });
     }
-    setSyncStatus('done');
-    return true;
+    if (!res.ok) { lastSyncErr = 'HTTP ' + res.status; setSyncStatus('error'); return { ok: false, at: 0, err: 'HTTP ' + res.status }; }
+    let at = Date.now();
+    try {
+      const g = await fetch(`${SUPABASE_URL}/rest/v1/app_data?id=eq.${DATA_ID}&select=updated_at`, {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+      });
+      if (g.ok) { const a = await g.json(); if (a && a[0] && a[0].updated_at) at = Date.parse(a[0].updated_at) || at; }
+    } catch (e) {}
+    setSyncStatus('done'); lastSyncErr = '';
+    return { ok: true, at, err: null };
   } catch (e) {
-    setSyncStatus('error');
-    return false;
+    lastSyncErr = 'network'; setSyncStatus('error');
+    return { ok: false, at: 0, err: 'network' };
   }
 }
 
@@ -341,47 +353,105 @@ function setSyncStatus(s) {
 // ====== Local cache + cloud sync ======
 let D = {};
 const LOCAL_KEY = 'cunhaoguanjia_v1';
+const META_KEY = 'cunhaoguanjia_meta_v1';
 function localLoad() {
   try { return JSON.parse(localStorage.getItem(LOCAL_KEY)) || {}; } catch { return {}; }
 }
 function localSave(d) {
-  localStorage.setItem(LOCAL_KEY, JSON.stringify(d));
+  try { localStorage.setItem(LOCAL_KEY, JSON.stringify(d)); } catch (e) {}
+}
+function metaLoad() { try { return JSON.parse(localStorage.getItem(META_KEY)) || {}; } catch (e) { return {}; } }
+function metaSave(m) { try { localStorage.setItem(META_KEY, JSON.stringify(m)); } catch (e) {} }
+let syncMeta = metaLoad(); // { baseAt: 上次同步时云端 updated_at, dirty: 本地有未上传改动 }
+function backupLocal() {
+  try { localStorage.setItem('cunhaoguanjia_backup_' + Date.now(), JSON.stringify(D)); } catch (e) {}
+}
+// 数据兜底：任何入口访问数据前先确保模块结构存在，避免"按钮点不开 / 白屏"
+function ensureD() { if (!D || typeof D !== 'object') D = {}; normalizeD(); }
+function hasLocalData() {
+  const n = (D.bookkeeping && D.bookkeeping.expenses || []).length
+    + (D.stall && D.stall.records || []).length
+    + (D.saving && D.saving.records || []).length
+    + (D.debt && D.debt.records || []).length
+    + (D.piggy && D.piggy.records || []).length;
+  return n > 0; // 有实际记录才算本地有数据，避免空壳覆盖云端
+}
+function normalizeD() {
+  if (!D.bookkeeping) D.bookkeeping = { monthlyBudget: 500, expenses: [] };
+  if (!D.stall) D.stall = { monthlyGoal: 800, records: [] };
+  if (!D.saving) D.saving = { goal: 1000, start: '', end: '', records: [] };
+  if (!D.debt) D.debt = { records: [], log: [] };
+  if (!D.piggy) D.piggy = { start: 0.2, step: 0.2, records: [] };
+  if (!D.debt.log) D.debt.log = [];
+}
+
+// 上传本地数据到云端
+async function pushToCloud(silent) {
+  const r = await cloudSave(D);
+  if (r.ok) { syncMeta.baseAt = r.at || Date.now(); syncMeta.dirty = false; metaSave(syncMeta); if (!silent) showToast('已上传到云端'); return true; }
+  syncMeta.dirty = true; metaSave(syncMeta);
+  if (!silent) showToast('上传失败：' + (r.err || '未知原因'));
+  return false;
+}
+
+// 拉取云端数据：云端 updated_at 新于本地基准 → 以云端为准
+async function syncFromCloud(silent) {
+  const c = await cloudLoad();
+  if (c.err) { if (!silent) showToast('云端读取失败：' + c.err); return false; }
+  if (c.data && Object.keys(c.data).length > 0) {
+    const baseAt = syncMeta.baseAt || 0;
+    if (c.at > baseAt + 1000) {
+      if (!baseAt && hasLocalData()) { backupLocal(); if (!silent) showToast('已备份本机旧数据，改用云端数据'); }
+      else if (syncMeta.dirty) { backupLocal(); if (!silent) showToast('云端有更新，本机改动已备份'); }
+      D = c.data; normalizeD(); localSave(D);
+      syncMeta.baseAt = c.at; syncMeta.dirty = false; metaSave(syncMeta);
+      render();
+      if (!silent) showToast('已同步云端最新数据');
+      return true;
+    }
+    return false;
+  }
+  // 云端为空、本地有数据 → 补传本地，避免误判为空数据
+  if (hasLocalData()) { await pushToCloud(silent); }
+  return false;
 }
 
 async function save() {
   localSave(D);
-  await cloudSave(D);
+  const r = await cloudSave(D);
+  if (r.ok) { syncMeta.baseAt = r.at || Date.now(); syncMeta.dirty = false; }
+  else { syncMeta.dirty = true; }
+  metaSave(syncMeta);
   render();
 }
 
 async function initApp() {
-  // Try local first
   D = localLoad();
-  if (D && Object.keys(D).length > 0 && (D.bookkeeping || D.stall || D.saving || D.debt || D.piggy)) {
-    // Local has data, use it
-  } else {
-    // Fall back to cloud
-    const cloud = await cloudLoad();
-    if (cloud && Object.keys(cloud).length > 0) {
-      D = cloud;
-      localSave(D);
-    } else {
-      // Both empty, init defaults
-      D.bookkeeping = { monthlyBudget: 500, expenses: [] };
-      D.stall = { monthlyGoal: 800, records: [] };
-      D.saving = { goal: 1000, start: '', end: '', records: [] };
-      D.debt = { records: [], log: [] };
-      D.piggy = { start: 0.2, step: 0.2, records: [] };
-    }
-  }
-  if (!D.bookkeeping) D.bookkeeping = { monthlyBudget: 500, expenses: [] };
-  if (!D.stall) D.stall = { monthlyGoal: 800, records: [] };
-  if (!D.saving) D.saving = { goal: 1000, start: '', end: '', records: [] };
-  if (!D.debt) D.debt = { records: [] };
-  if (!D.piggy) D.piggy = { start: 0.2, step: 0.2, records: [] };
-  if (!D.debt.log) D.debt.log = [];
-  render();
+  normalizeD();
+  render();          // 先用本地缓存秒开
+  await syncFromCloud(true); // 再与云端比对，云端新则以云端为准
+  startAutoSync();
 }
+
+let autoSyncTimer = null;
+function startAutoSync() {
+  if (autoSyncTimer) clearInterval(autoSyncTimer);
+  autoSyncTimer = setInterval(() => {
+    if (document.visibilityState === 'visible' && pwdSession && !syncMeta.dirty) syncFromCloud(true);
+  }, 25000);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && pwdSession) syncFromCloud(true);
+  });
+}
+async function manualSync() {
+  showToast('正在同步...');
+  const changed = await syncFromCloud(false);
+  if (!changed && !lastSyncErr) showToast('已是最新数据');
+}
+(function () {
+  const s = document.querySelector('.sync-status');
+  if (s) { s.style.cursor = 'pointer'; s.title = '点击立即同步'; s.onclick = manualSync; }
+})();
 
 // ====== Utils ======
 const today = new Date();
@@ -395,15 +465,15 @@ function openModal(html){document.getElementById('modal-content').innerHTML=html
 function closeModal(){document.getElementById('modal').classList.remove('show')}
 document.querySelectorAll('.nav-item').forEach(n=>{n.onclick=()=>{document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));n.classList.add('active');document.getElementById('page-'+n.dataset.page).classList.add('active');if(n.dataset.page==='plan')renderPlan()}});
 window.addEventListener('resize',()=>{if(document.getElementById('page-plan')&&document.getElementById('page-plan').classList.contains('active'))pgFitCell()});
-function setBudget(){openModal('<div class="modal-title">设置月度预算</div><div class="form-group"><label class="form-label">本月预算（元）</label><input type="number" class="form-input" id="m-budget" value="'+(D.bookkeeping.monthlyBudget||0)+'"></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">取消</button><button class="btn-ok" onclick="saveBudget()">确认</button></div>')}
+function setBudget(){ensureD();openModal('<div class="modal-title">设置月度预算</div><div class="form-group"><label class="form-label">本月预算（元）</label><input type="number" class="form-input" id="m-budget" value="'+(D.bookkeeping.monthlyBudget||0)+'"></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">取消</button><button class="btn-ok" onclick="saveBudget()">确认</button></div>')}
 function saveBudget(){D.bookkeeping.monthlyBudget=Number(document.getElementById('m-budget').value)||0;save();closeModal();showToast('已保存')}
-function openAddExpenseModal(){openModal('<div class="modal-title">添加花费</div><div class="form-group"><label class="form-label">分类</label><select class="form-input" id="d-cat"><option>🍜 餐饮</option><option>🚇 交通</option><option>🛒 购物</option><option>💊 医疗</option><option>🎮 娱乐</option><option>📚 学习</option><option>🏠 居家</option><option>💼 其他</option></select></div><div class="form-group"><label class="form-label">日期</label><input type="date" class="form-input" id="d-date" value="'+ymd()+'"></div><div class="form-group"><label class="form-label">备注</label><input type="text" class="form-input" id="d-note" placeholder="可选"></div><div class="form-group"><label class="form-label">金额（元）</label><input type="number" class="form-input" id="d-amt" placeholder="请输入金额"></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">取消</button><button class="btn-ok" onclick="addExpense()">确认</button></div>')}
+function openAddExpenseModal(){ensureD();openModal('<div class="modal-title">添加花费</div><div class="form-group"><label class="form-label">分类</label><select class="form-input" id="d-cat"><option>🍜 餐饮</option><option>🚇 交通</option><option>🛒 购物</option><option>💊 医疗</option><option>🎮 娱乐</option><option>📚 学习</option><option>🏠 居家</option><option>💼 其他</option></select></div><div class="form-group"><label class="form-label">日期</label><input type="date" class="form-input" id="d-date" value="'+ymd()+'"></div><div class="form-group"><label class="form-label">备注</label><input type="text" class="form-input" id="d-note" placeholder="可选"></div><div class="form-group"><label class="form-label">金额（元）</label><input type="number" class="form-input" id="d-amt" placeholder="请输入金额"></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">取消</button><button class="btn-ok" onclick="addExpense()">确认</button></div>')}
 async function addExpense(){const amt=Number(document.getElementById('d-amt').value);if(!amt||amt<=0)return showToast('请输入金额');const cat=document.getElementById('d-cat').value;const note=document.getElementById('d-note').value;const date=document.getElementById('d-date').value||ymd();D.bookkeeping.expenses.push({date,cat,note,amt});await save();closeModal();showToast('已添加')}
 async function delExpense(i){D.bookkeeping.expenses.splice(i,1);await save()}
 function renderBookkeeping(){const bk=D.bookkeeping;const exp=bk.expenses||[];const monthExp=exp.filter(e=>e.date.startsWith(ym()));const monthSpent=monthExp.reduce((s,e)=>s+e.amt,0);const todayExp=exp.filter(e=>e.date===ymd());const todaySpent=todayExp.reduce((s,e)=>s+e.amt,0);const days=daysInMonth(today);const dailyBudget=(bk.monthlyBudget||0)/days;const dayOfMonth=today.getDate();const uptodateExp=exp.filter(e=>{const d=e.date.startsWith(ym());if(!d)return false;const day=parseInt(e.date.split('-')[2]);return day<=dayOfMonth});const uptodateSpent=uptodateExp.reduce((s,e)=>s+e.amt,0);const balance=(dailyBudget*dayOfMonth)-uptodateSpent;document.getElementById('bk-date').textContent=today.getFullYear()+'年'+(today.getMonth()+1)+'月'+today.getDate()+'日 星期'+'日一二三四五六'[today.getDay()];document.getElementById('bk-today-budget').textContent=fmt(dailyBudget)+'元';document.getElementById('bk-today-spent').textContent=fmt(todaySpent)+'元';document.getElementById('bk-today-count').textContent='共 '+todayExp.length+' 笔';document.getElementById('bk-balance').textContent=(balance>=0?fmt(balance):'-'+fmt(-balance))+'元';document.getElementById('bk-over').textContent=balance<0?'累计已超支 '+fmt(-balance)+'元':'预算充足';document.getElementById('bk-month-budget').textContent=fmt(bk.monthlyBudget||0)+'元';let inDays=0;for(let i=1;i<=today.getDate();i++){const d=new Date(today.getFullYear(),today.getMonth(),i);const dExp=exp.filter(e=>e.date===ymd(d)).reduce((s,e)=>s+e.amt,0);if(dExp<=dailyBudget)inDays++}document.getElementById('bk-in-days').textContent='当月 '+inDays+' 天在预算内';const left=(bk.monthlyBudget||0)-monthSpent;const pct=Math.min(100,Math.round(monthSpent/(bk.monthlyBudget||1)*100));document.getElementById('bk-progress').style.width=pct+'%';document.getElementById('bk-month-spent').textContent=fmt(monthSpent);document.getElementById('bk-month-left').textContent=fmt(left);const allList=(D.bookkeeping.expenses||[]).filter(e=>e.date&&e.date.startsWith(ym())).slice().reverse();const html=allList.length?allList.map((e,i)=>{const idx=D.bookkeeping.expenses.length-1-i;return '<div class="record"><div class="record-left"><div class="record-icon">🍜</div><div class="record-info"><div class="r1">'+e.cat+(e.note?' · '+e.note:'')+'</div><div class="r2">'+e.date+'</div></div></div><div style="display:flex;align-items:center"><div class="record-amt neg">-'+fmt(e.amt)+'</div><button class="record-del" onclick="delExpense('+idx+')">×</button></div></div>'}).join(''):'<div class="empty">本月还没有记账</div>';document.getElementById('bk-list').innerHTML=html}
-function setStallGoal(){openModal('<div class="modal-title">设置本月摆摊目标</div><div class="form-group"><label class="form-label">目标金额（元）</label><input type="number" class="form-input" id="m-goal" value="'+(D.stall.monthlyGoal||0)+'"></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">取消</button><button class="btn-ok" onclick="saveStallGoal()">确认</button></div>')}
+function setStallGoal(){ensureD();openModal('<div class="modal-title">设置本月摆摊目标</div><div class="form-group"><label class="form-label">目标金额（元）</label><input type="number" class="form-input" id="m-goal" value="'+(D.stall.monthlyGoal||0)+'"></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">取消</button><button class="btn-ok" onclick="saveStallGoal()">确认</button></div>')}
 async function saveStallGoal(){D.stall.monthlyGoal=Number(document.getElementById('m-goal').value)||0;save();closeModal();showToast('已保存')}
-function addIncome(){openModal('<div class="modal-title">记录收入 / 支出</div><div class="form-group"><label class="form-label">类型</label><select class="form-select" id="m-type" onchange="toggleStallFields()"><option value="income">线上收入</option><option value="offline">线下收入</option><option value="cost">成本支出</option></select></div><div class="form-group" id="m-channel-group"><label class="form-label">线上渠道</label><select class="form-select" id="m-channel"><option>小红书</option><option>闲鱼</option><option>拼多多</option><option>抖音</option><option>自定义</option></select></div><div class="form-group"><label class="form-label">金额（元）</label><input type="number" class="form-input" id="m-amt" placeholder="请输入金额"></div><div class="form-group"><label class="form-label">说明</label><input type="text" class="form-input" id="m-note" placeholder="如：烤肠收入"></div><div class="form-group"><label class="form-label">日期</label><input type="date" class="form-input" id="m-date" value="'+ymd()+'"></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">取消</button><button class="btn-ok" onclick="saveIncome()">确认</button></div>')}
+function addIncome(){ensureD();openModal('<div class="modal-title">记录收入 / 支出</div><div class="form-group"><label class="form-label">类型</label><select class="form-select" id="m-type" onchange="toggleStallFields()"><option value="income">线上收入</option><option value="offline">线下收入</option><option value="cost">成本支出</option></select></div><div class="form-group" id="m-channel-group"><label class="form-label">线上渠道</label><select class="form-select" id="m-channel"><option>小红书</option><option>闲鱼</option><option>拼多多</option><option>抖音</option><option>自定义</option></select></div><div class="form-group"><label class="form-label">金额（元）</label><input type="number" class="form-input" id="m-amt" placeholder="请输入金额"></div><div class="form-group"><label class="form-label">说明</label><input type="text" class="form-input" id="m-note" placeholder="如：烤肠收入"></div><div class="form-group"><label class="form-label">日期</label><input type="date" class="form-input" id="m-date" value="'+ymd()+'"></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">取消</button><button class="btn-ok" onclick="saveIncome()">确认</button></div>')}
 function toggleStallFields(){const t=document.getElementById('m-type').value;document.getElementById('m-channel-group').style.display=t==='income'?'block':'none'}
 async function saveIncome(){const type=document.getElementById('m-type').value;const amt=Number(document.getElementById('m-amt').value);if(!amt||amt<=0)return showToast('请输入金额');const channel=document.getElementById('m-channel').value;const note=document.getElementById('m-note').value;const date=document.getElementById('m-date').value||ymd();D.stall.records.push({type,channel,note,amt,date});save();closeModal();showToast('已记录')}
 let pieStallObj=null;
@@ -420,9 +490,9 @@ const lgOL=document.getElementById('st-onoff-legend');
 if(lgOL)lgOL.innerHTML='<div><div class="st-pie-lg-item"><i class="pie-dot" style="background:#f5a04e"></i><span class="st-pie-lg-name">线上</span><span class="st-pie-lg-pct">'+onPct.toFixed(1)+'%</span></div><div class="st-pie-lg-amt">'+fmt(online)+' 元</div></div>'
 +'<div><div class="st-pie-lg-item"><i class="pie-dot" style="background:#7ba7d9"></i><span class="st-pie-lg-name">线下</span><span class="st-pie-lg-pct">'+offPct.toFixed(1)+'%</span></div><div class="st-pie-lg-amt">'+fmt(offline)+' 元</div></div>';const channelMap={};monthRec.filter(r=>r.type==='income').forEach(r=>{channelMap[r.channel]=(channelMap[r.channel]||0)+r.amt});const labels=Object.keys(channelMap);const data=labels.map(l=>channelMap[l]);const colors=['#e9c465','#d99fb0','#7ba7d9','#6cc28b','#f5a04e','#b88fd9','#5fb4b4'];const ctx=document.getElementById('pieStall');if(pieStallObj)pieStallObj.destroy();if(labels.length){pieStallObj=new Chart(ctx,{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors.slice(0,labels.length),borderWidth:0}]},options:{cutout:'60%',plugins:{legend:{display:false}}}})}else{ctx.getContext('2d').clearRect(0,0,200,200)}const legendHtml=labels.length?labels.map((l,i)=>'<div class="pie-legend-item"><div class="pie-dot" style="background:'+colors[i]+'"></div>'+l+'<span class="pie-amt">'+channelMap[l]+' ('+(channelMap[l]/(online||1)*100).toFixed(0)+'%)</span></div>').join(''):'<div class="empty">暂无数据</div>';document.getElementById('st-legend').innerHTML=legendHtml;document.getElementById('st-cost').textContent=fmt(totalCost)+' 元';document.getElementById('st-profit').textContent=fmt(profit);const sorted=rec.slice().reverse();const html=sorted.length?sorted.map((r,ri)=>{const i=rec.length-1-ri;let label='',amtClass='',sign='';if(r.type==='income'){label='线上 · '+r.channel;amtClass='pos';sign='+'}else if(r.type==='offline'){label='线下 · '+(r.channel||'收入');amtClass='pos';sign='+'}else{label='成本支出'+(r.note?' · '+r.note:'');amtClass='neg';sign='-'}return '<div class="record"><div class="record-left"><div class="record-icon">'+(r.type==='cost'?'💸':(r.type==='offline'?'🏪':'📱'))+'</div><div class="record-info"><div class="r1">'+label+'</div><div class="r2">'+r.date+'</div></div></div><div style="display:flex;align-items:center"><div class="record-amt '+amtClass+'">'+sign+fmt(r.amt)+'</div><button class="record-del" onclick="delStall('+i+')">×</button></div></div>'}).join(''):'<div class="empty">还没有摆摊记录</div>';document.getElementById('st-list').innerHTML=html}
 async function delStall(i){D.stall.records.splice(i,1);await save()}
-function setSavingGoal(){openModal('<div class="modal-title">设置存钱目标</div><div class="form-group"><label class="form-label">总目标（元）</label><input type="number" class="form-input" id="m-sv-goal" value="'+(D.saving.goal||0)+'"></div><div class="form-group"><label class="form-label">开始日期</label><input type="date" class="form-input" id="m-sv-start" value="'+(D.saving.start||ymd())+'"></div><div class="form-group"><label class="form-label">截止日期</label><input type="date" class="form-input" id="m-sv-end" value="'+(D.saving.end||'')+'"></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">取消</button><button class="btn-ok" onclick="saveSavingGoal()">确认</button></div>')}
+function setSavingGoal(){ensureD();openModal('<div class="modal-title">设置存钱目标</div><div class="form-group"><label class="form-label">总目标（元）</label><input type="number" class="form-input" id="m-sv-goal" value="'+(D.saving.goal||0)+'"></div><div class="form-group"><label class="form-label">开始日期</label><input type="date" class="form-input" id="m-sv-start" value="'+(D.saving.start||ymd())+'"></div><div class="form-group"><label class="form-label">截止日期</label><input type="date" class="form-input" id="m-sv-end" value="'+(D.saving.end||'')+'"></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">取消</button><button class="btn-ok" onclick="saveSavingGoal()">确认</button></div>')}
 async function saveSavingGoal(){D.saving.goal=Number(document.getElementById('m-sv-goal').value)||0;D.saving.start=document.getElementById('m-sv-start').value;D.saving.end=document.getElementById('m-sv-end').value;await save();closeModal();showToast('已保存')}
-function addSaving(){openModal('<div class="modal-title">存入</div><div class="form-group"><label class="form-label">金额（元）</label><input type="number" class="form-input" id="sv-amt" placeholder="请输入存入金额"></div><div class="form-group"><label class="form-label">日期</label><input type="date" class="form-input" id="sv-date" value="'+ymd()+'"></div><div class="form-group"><label class="form-label">备注</label><input type="text" class="form-input" id="sv-note" placeholder="如：工资"></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">取消</button><button class="btn-ok" onclick="saveSaving()">确认</button></div>')}
+function addSaving(){ensureD();openModal('<div class="modal-title">存入</div><div class="form-group"><label class="form-label">金额（元）</label><input type="number" class="form-input" id="sv-amt" placeholder="请输入存入金额"></div><div class="form-group"><label class="form-label">日期</label><input type="date" class="form-input" id="sv-date" value="'+ymd()+'"></div><div class="form-group"><label class="form-label">备注</label><input type="text" class="form-input" id="sv-note" placeholder="如：工资"></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">取消</button><button class="btn-ok" onclick="saveSaving()">确认</button></div>')}
 async function saveSaving(){const amt=Number(document.getElementById('sv-amt').value);if(!amt||amt<=0)return showToast('请输入金额');D.saving.records.push({date:document.getElementById('sv-date').value||ymd(),amt,note:document.getElementById('sv-note').value});save();closeModal();showToast('已存入')}
 let pieSavingObj=null;
 function renderSaving(){const sv=D.saving;const rec=sv.records||[];const totalSaved=rec.reduce((s,r)=>s+r.amt,0);const goal=sv.goal||0;const remaining=Math.max(0,goal-totalSaved);document.getElementById('sv-date').textContent=today.getFullYear()+'年'+(today.getMonth()+1)+'月'+today.getDate()+'日 星期'+'日一二三四五六'[today.getDay()];document.getElementById('sv-start').textContent=sv.start||'--';document.getElementById('sv-end').textContent=sv.end||'--';if(sv.start&&sv.end){const left=daysBetween(ymd(),sv.end);document.getElementById('sv-days').textContent=left>0?left+' 天':'已到期'}else{document.getElementById('sv-days').textContent='--'}const pct=goal>0?Math.min(100,totalSaved/goal*100):0;document.getElementById('sv-progress').style.width=pct+'%';document.getElementById('sv-percent-text').textContent=pct.toFixed(1)+'%';document.getElementById('sv-total-goal').textContent=fmt(goal)+' 元';let monthTarget=0;if(sv.start&&sv.end){const months=Math.max(1,daysBetween(sv.start,sv.end)/30);monthTarget=goal/months}document.getElementById('sv-month-target').textContent=fmt(monthTarget)+' 元';const monthRec=rec.filter(r=>r.date.startsWith(ym()));const monthActual=monthRec.reduce((s,r)=>s+r.amt,0);document.getElementById('sv-month-actual').textContent=fmt(monthActual)+' 元';document.getElementById('sv-ratio').textContent=fmt(totalSaved)+' / '+fmt(remaining);const ctx=document.getElementById('pieSaving');if(pieSavingObj)pieSavingObj.destroy();if(goal>0){pieSavingObj=new Chart(ctx,{type:'doughnut',data:{labels:['已存入','未存入'],datasets:[{data:[totalSaved,remaining],backgroundColor:['#6cc28b','#e57b85'],borderWidth:0}]},options:{cutout:'60%',plugins:{legend:{display:false}}}});document.getElementById('sv-legend').innerHTML='<div class="pie-legend-item"><div class="pie-dot" style="background:#6cc28b"></div>已存入<span class="pie-amt">'+fmt(totalSaved)+' ('+pct.toFixed(0)+'%)</span></div><div class="pie-legend-item"><div class="pie-dot" style="background:#e57b85"></div>未存入<span class="pie-amt">'+fmt(remaining)+' ('+(100-pct).toFixed(0)+'%)</span></div>'}else{ctx.getContext('2d').clearRect(0,0,200,200);document.getElementById('sv-legend').innerHTML='<div class="empty">请先设置目标</div>'}const sorted=rec.slice().reverse();const html=sorted.length?sorted.map((r,ri)=>{const i=rec.length-1-ri;return '<div class="record"><div class="record-left"><div class="record-icon">💰</div><div class="record-info"><div class="r1">存入'+(r.note?' · '+r.note:'')+'</div><div class="r2">'+r.date+'</div></div></div><div style="display:flex;align-items:center"><div class="record-amt pos">+'+fmt(r.amt)+'</div><button class="record-del" onclick="delSaving('+i+')">×</button></div></div>'}).join(''):'<div class="empty">还没有存钱记录</div>';document.getElementById('sv-list').innerHTML=html}
@@ -453,11 +523,11 @@ async function delDebtLog(i){
   D.debt.log.splice(i,1);
   await save();
 }
-function renderDebtGroups(){const rec=D.debt.records||[];const groupMap={};rec.forEach(r=>{if(!groupMap[r.name])groupMap[r.name]={total:0,paid:0,records:[]};groupMap[r.name].total+=r.amt;groupMap[r.name].paid+=(r.paid||0);groupMap[r.name].records.push(r)});const names=Object.keys(groupMap);const html=names.length?names.map(name=>{const g=groupMap[name];const remaining=g.total-g.paid;const pct=g.total>0?Math.min(100,g.paid/g.total*100):0;return '<div class="debt-group-card"><div class="row1"><div class="name">'+name+'</div><div><div class="remain">'+fmt(remaining)+'</div><div class="remain-sub">待还</div></div></div><div class="row2"><span>总 '+fmt(g.total)+' · 已还 '+fmt(g.paid)+'</span><span>'+pct.toFixed(0)+'%</span></div><div class="progress"><div class="progress-fill" style="width:'+pct+'%;background:linear-gradient(90deg,var(--green),#5aa876)"></div></div><button class="btn-add-2 pay-btn" onclick="payDebtGroup(\''+name+'\')" style="width:100%">💰 还款</button></div>'}).join(''):'<div class="empty">还没有负债记录</div>';document.getElementById('dt-groups').innerHTML=html}
+function renderDebtGroups(){ensureD();const rec=D.debt.records||[];const groupMap={};rec.forEach(r=>{if(!groupMap[r.name])groupMap[r.name]={total:0,paid:0,records:[]};groupMap[r.name].total+=r.amt;groupMap[r.name].paid+=(r.paid||0);groupMap[r.name].records.push(r)});const names=Object.keys(groupMap);const html=names.length?names.map(name=>{const g=groupMap[name];const remaining=g.total-g.paid;const pct=g.total>0?Math.min(100,g.paid/g.total*100):0;return '<div class="debt-group-card"><div class="row1"><div class="name">'+name+'</div><div><div class="remain">'+fmt(remaining)+'</div><div class="remain-sub">待还</div></div></div><div class="row2"><span>总 '+fmt(g.total)+' · 已还 '+fmt(g.paid)+'</span><span>'+pct.toFixed(0)+'%</span></div><div class="progress"><div class="progress-fill" style="width:'+pct+'%;background:linear-gradient(90deg,var(--green),#5aa876)"></div></div><button class="btn-add-2 pay-btn" onclick="payDebtGroup(\''+name+'\')" style="width:100%">💰 还款</button></div>'}).join(''):'<div class="empty">还没有负债记录</div>';document.getElementById('dt-groups').innerHTML=html}
 function payDebtGroup(name){openModal('<div class="modal-title">还款 · '+name+'</div><div class="form-group"><label class="form-label">还款金额（元）</label><input type="number" class="form-input" id="pg-amt" placeholder="请输入还款金额"></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">取消</button><button class="btn-ok" onclick="doPayGroup(\''+name+'\')">确认</button></div>')}
 async function doPayGroup(name){const amt=Number(document.getElementById('pg-amt').value);if(!amt||amt<=0)return showToast('请输入金额');const recs=D.debt.records.filter(r=>r.name===name);let remain=amt;for(const r of recs){if(remain<=0)break;const left=r.amt-(r.paid||0);if(left<=0)continue;if(remain>=left){r.paid=r.amt;remain-=left}else{r.paid=(r.paid||0)+remain;remain=0}r.lastPayDate=ymd()}const payDate=ymd();D.debt.log.push({type:'pay',name,amt:amt-remain,date:payDate});await save();closeModal();showToast('已还款')}
 function renderDebt(){const rec=D.debt.records||[];const total=rec.reduce((s,r)=>s+r.amt,0);const paid=rec.reduce((s,r)=>s+(r.paid||0),0);const remaining=total-paid;const monthPaid=rec.filter(r=>r.lastPayDate&&r.lastPayDate.startsWith(ym())).reduce((s,r)=>s+(r.paid||0),0);const monthNew=rec.filter(r=>r.date.startsWith(ym())).reduce((s,r)=>s+r.amt,0);const pct=total>0?Math.min(100,paid/total*100):0;document.getElementById('dt-total').textContent=fmt(total);document.getElementById('dt-paid').textContent=fmt(paid);document.getElementById('dt-remaining').textContent=fmt(remaining);document.getElementById('dt-progress-text').textContent=pct.toFixed(0)+'%';document.getElementById('dt-month-paid').textContent=fmt(monthPaid);document.getElementById('dt-month-new').textContent=fmt(monthNew);document.getElementById('dt-progress').style.width=pct+'%';document.getElementById('dt-progress-num').textContent=pct.toFixed(0)+'%';const ctx=document.getElementById('pieDebt');if(window.pieDebtObj)window.pieDebtObj.destroy();if(total>0){window.pieDebtObj=new Chart(ctx,{type:'doughnut',data:{labels:['已还','未还'],datasets:[{data:[paid,remaining],backgroundColor:['#6cc28b','#e57b85'],borderWidth:0}]},options:{cutout:'60%',plugins:{legend:{display:false}}}});document.getElementById('dt-legend').innerHTML='<div class="pie-legend-item"><div class="pie-dot" style="background:#6cc28b"></div>已还<span class="pie-amt">'+fmt(paid)+' ('+pct.toFixed(0)+'%)</span></div><div class="pie-legend-item"><div class="pie-dot" style="background:#e57b85"></div>未还<span class="pie-amt">'+fmt(remaining)+' ('+(100-pct).toFixed(0)+'%)</span></div>'}else{document.getElementById('dt-legend').innerHTML=''}renderDebtGroups();const dtLog=(D.debt.log||[]).slice().reverse();const dtHtml=dtLog.length?dtLog.map((r,i)=>{const idx=D.debt.log.length-1-i;const isAdd=r.type==='add';const icon=isAdd?'📋':'💰';const sign=isAdd?'+':'-';const cls=isAdd?'neg':'pos';const sub=isAdd?'增加负债':'还款';return '<div class="record"><div class="record-left"><div class="record-icon">'+icon+'</div><div class="record-info"><div class="r1">'+r.name+' · '+sub+(r.note?' · '+r.note:'')+'</div><div class="r2">'+r.date+'</div></div></div><div style="display:flex;align-items:center"><div class="record-amt '+cls+'">'+sign+fmt(r.amt)+'</div><button class="record-del" onclick="delDebtLog('+idx+')">×</button></div></div>'}).join(''):'<div class="empty">还没有负债添加记录</div>';document.getElementById('dt-list').innerHTML=dtHtml}
-function showHistory(t){openModal('<div class="modal-title">查询往月</div><div class="form-group"><label class="form-label">选择月份</label><input type="month" class="form-input" id="h-month" value="'+ym()+'"></div><div id="h-result" style="max-height:50vh;overflow-y:auto"></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">关闭</button><button class="btn-ok" onclick="doHistory(\''+t+'\')">查询</button></div>');doHistory(t)}
+function showHistory(t){ensureD();openModal('<div class="modal-title">查询往月</div><div class="form-group"><label class="form-label">选择月份</label><input type="month" class="form-input" id="h-month" value="'+ym()+'"></div><div id="h-result" style="max-height:50vh;overflow-y:auto"></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">关闭</button><button class="btn-ok" onclick="doHistory(\''+t+'\')">查询</button></div>');doHistory(t)}
 function doHistory(t){const m=document.getElementById('h-month').value;let html='<div style="padding:8px 0">';if(t==='bookkeeping'){const exp=D.bookkeeping.expenses.filter(e=>e.date.startsWith(m));const total=exp.reduce((s,e)=>s+e.amt,0);html+='<div style="font-weight:600;margin-bottom:8px">'+m+' 共支出 '+fmt(total)+' 元 ('+exp.length+' 笔)</div>';html+=exp.length?exp.map(e=>'<div class="record"><div class="record-info"><div class="r1">'+e.cat+' '+(e.note||'')+'</div><div class="r2">'+e.date+'</div></div><div class="record-amt neg">-'+fmt(e.amt)+'</div></div>').join(''):'<div class="empty">无记录</div>'}else if(t==='stall'){const rec=D.stall.records.filter(r=>r.date.startsWith(m));const income=rec.filter(r=>r.type!=='cost').reduce((s,r)=>s+r.amt,0);const cost=rec.filter(r=>r.type==='cost').reduce((s,r)=>s+r.amt,0);html+='<div style="font-weight:600;margin-bottom:8px">'+m+' 收入 '+fmt(income)+' / 成本 '+fmt(cost)+' / 利润 '+fmt(income-cost)+'</div>';html+=rec.length?rec.map(r=>'<div class="record"><div class="record-info"><div class="r1">'+(r.type==='cost'?'成本':r.channel||'线下')+' '+(r.note||'')+'</div><div class="r2">'+r.date+'</div></div><div class="record-amt '+(r.type==='cost'?'neg':'pos')+'">'+(r.type==='cost'?'-':'+')+fmt(r.amt)+'</div></div>').join(''):'<div class="empty">无记录</div>'}else if(t==='debt'){const rec=D.debt.records.filter(r=>r.date.startsWith(m));const total=rec.reduce((s,r)=>s+r.amt,0);const paid=rec.reduce((s,r)=>s+(r.paid||0),0);const remaining=total-paid;html+='<div style="font-weight:600;margin-bottom:8px">'+m+' 负债 '+fmt(total)+' 元 / 已还 '+fmt(paid)+' / 待还 '+fmt(remaining)+' ('+rec.length+' 笔)</div>';html+=rec.length?rec.map(r=>'<div class="record"><div class="record-info"><div class="r1">'+r.name+' '+(r.note||'')+'</div><div class="r2">'+r.date+' · 本金 '+fmt(r.amt)+' · 已还 '+fmt(r.paid||0)+'</div></div></div>').join(''):'<div class="empty">无记录</div>'}html+='</div>';document.getElementById('h-result').innerHTML=html}
 // ====== 存钱计划（爱心存钱打卡） ======
 const PG_LAYOUT=[[[5,6],[12,6]],[[4,15]],[[3,17]],[[2,19]],[[1,21]],[[1,21]],[[0,23]],[[0,23]],[[0,23]],[[0,23]],[[1,21]],[[1,21]],[[1,21]],[[2,19]],[[2,19]],[[3,17]],[[4,15]],[[5,13]],[[6,11]],[[7,9]],[[8,7]],[[9,5]],[[10,3]],[[11,1]]];
@@ -563,6 +633,7 @@ function pgMatchCell(amt){
   return j;
 }
 function pgAdd(fixedCell){
+  ensureD();
   const pg=pgData();
   const pre=fixedCell?pgCellAmt(fixedCell):'';
   openModal('<div class="modal-title">💗 存入一笔</div>'
@@ -683,7 +754,7 @@ function renderPlan(){
     return '<div class="record"><div class="record-left"><div class="record-icon">💗</div><div class="record-info"><div class="r1">'+(r.note||'爱心存入')+'</div><div class="r2">'+r.date+' · 点亮第 '+r.cell+' 格 · '+pgNumLabel(r.amt)+' 元</div></div></div><div class="record-amt pos">+'+fmt(r.amt)+'</div><button class="record-del" onclick="pgDel('+idx+')">✕</button></div>';
   }).join(''):'<div class="empty">还没有存入记录，点亮第一格爱心吧 ❤</div>';
 }
-function render(){renderBookkeeping();renderStall();renderSaving();renderDebt();renderPlan()}
+function render(){ensureD();renderBookkeeping();renderStall();renderSaving();renderDebt();renderPlan()}
 </script>
 </body>
 </html>
