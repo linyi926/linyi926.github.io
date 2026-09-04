@@ -431,16 +431,19 @@ async function initApp() {
   render();          // 先用本地缓存秒开
   await syncFromCloud(true); // 再与云端比对，云端新则以云端为准
   startAutoSync();
+  if (lastSyncErr) showToast('云端同步失败，数据暂存在本机');
 }
 
 let autoSyncTimer = null;
 function startAutoSync() {
   if (autoSyncTimer) clearInterval(autoSyncTimer);
   autoSyncTimer = setInterval(() => {
-    if (document.visibilityState === 'visible' && pwdSession && !syncMeta.dirty) syncFromCloud(true);
+    if (document.visibilityState !== 'visible' || !pwdSession) return;
+    if (syncMeta.dirty) pushToCloud(true); else syncFromCloud(true); // 失败过的改动会自动重试上传
   }, 25000);
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible' && pwdSession) syncFromCloud(true);
+    if (document.visibilityState !== 'visible' || !pwdSession) return;
+    if (syncMeta.dirty) pushToCloud(true); else syncFromCloud(true);
   });
 }
 async function manualSync() {
@@ -448,9 +451,70 @@ async function manualSync() {
   const changed = await syncFromCloud(false);
   if (!changed && !lastSyncErr) showToast('已是最新数据');
 }
+
+// ====== 数据体检 / 导出 / 导入（云端不可用时的兜底通道） ======
+function errHint() {
+  if (!lastSyncErr) return '云端连接正常';
+  if (lastSyncErr === 'network') return '连不上云端（网络不通或项目已停用）';
+  if (lastSyncErr === 'HTTP 401' || lastSyncErr === 'HTTP 403') return '云端拒绝访问（Supabase 表权限未开放，需在后台执行授权语句）';
+  if (lastSyncErr === 'HTTP 404') return '云端表不存在（app_data 表缺失或字段名不符）';
+  if (lastSyncErr === 'HTTP 400') return '云端返回 400（常见于 Supabase 项目被暂停，需到后台恢复项目）';
+  return '云端错误：' + lastSyncErr;
+}
+function diagModal() {
+  ensureD();
+  const n = (D.bookkeeping.expenses || []).length + (D.stall.records || []).length
+    + (D.saving.records || []).length + (D.debt.records || []).length + (D.piggy.records || []).length;
+  const t = (ts) => ts ? new Date(ts).toLocaleString('zh-CN') : '—';
+  openModal('<div class="modal-title">数据同步诊断</div>'
+    + '<div style="font-size:12px;line-height:2;color:var(--sub)">状态：<b style="color:' + (lastSyncErr ? 'var(--red)' : 'var(--green)') + '">' + (lastSyncErr ? '同步失败' : '已同步') + '</b><br>'
+    + '诊断：' + errHint() + '<br>'
+    + '本端记录数：' + n + ' 条<br>'
+    + '本端同步基准：' + t(syncMeta.baseAt) + '<br>'
+    + (syncMeta.dirty ? '<span style="color:var(--red)">有未上传的改动，会自动重试</span>' : '本机改动已上传')
+    + '</div>'
+    + '<div style="font-size:11px;color:var(--sub);line-height:1.8;margin-top:8px">云端不可用时，可用「导出数据」把本端数据存成文件，在另一台设备用「导入数据」恢复。</div>'
+    + '<div class="modal-actions" style="flex-wrap:wrap;gap:8px">'
+    + '<button class="btn-cancel" onclick="manualSync()">立即同步</button>'
+    + '<button class="btn-cancel" onclick="exportData()">导出数据</button>'
+    + '<button class="btn-ok" onclick="importData()">导入数据</button>'
+    + '</div>');
+}
+function exportData() {
+  try {
+    const blob = new Blob([JSON.stringify(D, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = '管家数据_' + ymd() + '.json';
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+    closeModal(); showToast('已导出数据文件');
+  } catch (e) { showToast('导出失败：' + e.message); }
+}
+function importData() {
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = '.json,application/json';
+  inp.onchange = () => {
+    const f = inp.files && inp.files[0]; if (!f) return;
+    const rd = new FileReader();
+    rd.onload = async () => {
+      try {
+        const obj = JSON.parse(rd.result);
+        if (!obj || typeof obj !== 'object') throw new Error('文件格式不对');
+        backupLocal();
+        D = obj; normalizeD(); localSave(D);
+        syncMeta.dirty = true; metaSave(syncMeta);
+        closeModal(); showToast('已导入，正在上传云端');
+        await pushToCloud(true); render();
+      } catch (e) { showToast('导入失败：' + e.message); }
+    };
+    rd.readAsText(f);
+  };
+  inp.click();
+}
 (function () {
   const s = document.querySelector('.sync-status');
-  if (s) { s.style.cursor = 'pointer'; s.title = '点击立即同步'; s.onclick = manualSync; }
+  if (s) { s.style.cursor = 'pointer'; s.title = '点击查看同步诊断 / 导出导入数据'; s.onclick = diagModal; }
 })();
 
 // ====== Utils ======
