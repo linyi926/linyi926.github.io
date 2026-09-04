@@ -136,6 +136,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 .pg-zbtn{min-width:24px;height:24px;padding:0 6px;border:1px solid var(--border);background:#fff;border-radius:7px;color:var(--sub);font-size:13px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent}
 .pg-zbtn:active{background:#f3f1ec;color:var(--text);border-color:#d9d5cc}
 .pg-zval{min-width:34px;text-align:center;font-size:10px;color:var(--sub);font-weight:400;font-variant-numeric:tabular-nums}
+/* 多选存入 */
+.pg-selbar{display:none;align-items:center;gap:8px;margin:0 0 6px;padding:6px 8px;background:#fff5f8;border:1px solid #f6dbe4;border-radius:10px;font-size:12px;color:#8a5a68}
+.pg-selbar.show{display:flex}
+.pg-selbar .pg-sel-sum{margin-left:auto;display:flex;align-items:center;gap:8px}
+.pg-sbtn{border:1px solid var(--border);background:#fff;border-radius:8px;padding:5px 10px;font-size:12px;cursor:pointer;font-family:inherit;color:var(--text);-webkit-tap-highlight-color:transparent}
+.pg-sbtn.primary{background:linear-gradient(135deg,#f7b6c8,#ef9ab3);border-color:#ef9ab3;color:#fff;font-weight:600}
+.pg-cell.sel{background:linear-gradient(135deg,#9ecbff,#6fb3f5);color:#fff;font-weight:600;box-shadow:inset 0 0 0 1.5px #3d82d6}
 .pg-cell{width:var(--pg-cell);height:var(--pg-cell);border-radius:2.5px;background:#f0eee8;color:#b3afa6;font-size:calc(var(--pg-cell)*.42);line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .15s;user-select:none;font-weight:500;letter-spacing:-.2px}
 .pg-cell:hover{transform:scale(1.4);position:relative;z-index:5;background:#e8e4da;color:var(--text)}
 .pg-cell.on{background:linear-gradient(135deg,#f7b6c8,#ef9ab3);color:#fff;font-weight:600;box-shadow:0 1px 2px rgba(214,105,135,.4)}
@@ -228,7 +235,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 <div data-page-node-id="VukAbaAHCGbOtmTcbUZ162" class="page-date" id="pg-date"></div>
 <div data-page-node-id="p2AY4kdhrKQmWApNK5xe0n" class="btn-row"><button data-page-node-id="8lSr6jzmEyHXYVcFo6IkPe" class="btn" onclick="pgAdd()"><!--pnid:F40w3IY7dxEdbOhPAAoILv-->💗 存入</button><button data-page-node-id="slS9atcblA2rA4utFmdDWN" class="btn" onclick="pgSettings()"><!--pnid:fKRi9raGh1OYHad1SA2tiA-->⚙️ 设置</button></div>
 <div data-page-node-id="idOAJbbJKLln2fxVMiz9v2" class="card"><div data-page-node-id="aV9q767dnij4NFQuapjo6s" style="display:flex; justify-content:space-between; font-size:12px; color:var(--sub); margin-bottom:6px"><span data-page-node-id="7lsx7aOhQYZLRKoS8kFEyb"><!--pnid:2iQkEp1SbTqhAXOLL3eGNc-->已点亮 <b data-page-node-id="fLKHBNlDY5V8WLUaRhR1jL" id="pg-lit-count" style="color:#d4718b"><!--pnid:3XPKVuhXXmd2yFhDJAF1Sd-->0 / 379</b><!--pnid:mx8ZLpNEKqWy13g9plYsoN--> 格</span><span data-page-node-id="PHPxh4XOPCIUerW1wRwPS8" id="pg-pct"><!--pnid:qKy7BBDQ2ZkOGz1VGoFWnG-->0.0%</span></div><div data-page-node-id="S7eCuBNfhom4hnpKnqV4IM" class="progress"><div data-page-node-id="9OsBc8rCgPnwXZwLRCbMiz" class="progress-fill" id="pg-progress" style="width:0%; background:linear-gradient(90deg,#f7b6c8,#e78ba6)"></div></div></div>
-<div data-page-node-id="7ijvDIkUrkxmDZhtzawkhD" class="card" style="padding:8px 6px"><div data-page-node-id="iQvEuWg867sGvPgwWQJ3JL" style="font-weight:600; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; padding:0 4px"><span data-page-node-id="WkK1fAMkBMmPWFe3QItNoc"><!--pnid:zxlTfPekMubbd47bg8n2oc-->💗 爱心存钱打卡</span><span data-page-node-id="8KzGftjPyyFD3NaJqTg9xe" class="pg-zbar" style="font-size:10px; color:var(--sub); font-weight:400"><!--pnid:9TfOGUPNicwaSpSKGVdypw--><button class="pg-zbtn" id="pg-z-out" onclick="pgZoomStep(-1)" aria-label="缩小">−</button><span class="pg-zval" id="pg-zval">1.0×</span><button class="pg-zbtn" id="pg-z-in" onclick="pgZoomStep(1)" aria-label="放大">＋</button><button class="pg-zbtn" id="pg-z-reset" style="display:none" onclick="pgZoomReset()">复位</button></span></div><div class="pg-viewport" id="pg-viewport"><div data-page-node-id="lN0CEQIeCwMFZoXZW5xYPs" class="pg-heart" id="pg-heart"></div></div><div data-page-node-id="DorehbAtWXTn2Uz1W37zjk" style="display:flex; justify-content:center; gap:16px; margin-top:10px; font-size:10px; color:var(--sub)"><span data-page-node-id="u7MQGikTXgqiM0kuXAEp5W"><i data-page-node-id="FXfmN9dnWfQJyFRjF8z8go" class="pg-demo-dot" style="background:linear-gradient(135deg,#f7b6c8,#ef9ab3)"></i><!--pnid:PeYN9KpgUGe4uJfYOwLzik-->已存入</span><span data-page-node-id="ruSkWUzHSxDIuJFYYpdGdS"><i data-page-node-id="STiw5N5qmzIFzQRwfuOpDN" class="pg-demo-dot" style="background:#f0eee8; border:1px solid #e4e2da"></i><!--pnid:Q8mRRNNpdKGYpnCRk3Fn4g-->待点亮</span><span id="pg-tip" style="color:#c9c5bc">· 双指张开放大，捏合恢复</span></div></div>
+<div data-page-node-id="7ijvDIkUrkxmDZhtzawkhD" class="card" style="padding:8px 6px"><div data-page-node-id="iQvEuWg867sGvPgwWQJ3JL" style="font-weight:600; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; padding:0 4px"><span data-page-node-id="WkK1fAMkBMmPWFe3QItNoc"><!--pnid:zxlTfPekMubbd47bg8n2oc-->💗 爱心存钱打卡</span><span data-page-node-id="8KzGftjPyyFD3NaJqTg9xe" class="pg-zbar" style="font-size:10px; color:var(--sub); font-weight:400"><!--pnid:9TfOGUPNicwaSpSKGVdypw--><button class="pg-zbtn" id="pg-sel-toggle" onclick="pgToggleSelMode()" title="多选格子一起存入" style="font-size:11px">多选</button><button class="pg-zbtn" id="pg-z-out" onclick="pgZoomStep(-1)" aria-label="缩小">−</button><span class="pg-zval" id="pg-zval">1.0×</span><button class="pg-zbtn" id="pg-z-in" onclick="pgZoomStep(1)" aria-label="放大">＋</button><button class="pg-zbtn" id="pg-z-reset" style="display:none" onclick="pgZoomReset()">复位</button></span></div><div class="pg-selbar" id="pg-selbar"><span id="pg-sel-info">已选 0 格</span><span class="pg-sel-sum"><span id="pg-sel-total" style="font-weight:700;color:#d4718b">0.00 元</span><button class="pg-sbtn" onclick="pgExitSel()">退出</button><button class="pg-sbtn primary" onclick="pgSelConfirm()">存入</button></span></div><div class="pg-viewport" id="pg-viewport"><div data-page-node-id="lN0CEQIeCwMFZoXZW5xYPs" class="pg-heart" id="pg-heart"></div></div><div data-page-node-id="DorehbAtWXTn2Uz1W37zjk" style="display:flex; justify-content:center; gap:16px; margin-top:10px; font-size:10px; color:var(--sub)"><span data-page-node-id="u7MQGikTXgqiM0kuXAEp5W"><i data-page-node-id="FXfmN9dnWfQJyFRjF8z8go" class="pg-demo-dot" style="background:linear-gradient(135deg,#f7b6c8,#ef9ab3)"></i><!--pnid:PeYN9KpgUGe4uJfYOwLzik-->已存入</span><span data-page-node-id="ruSkWUzHSxDIuJFYYpdGdS"><i data-page-node-id="STiw5N5qmzIFzQRwfuOpDN" class="pg-demo-dot" style="background:#f0eee8; border:1px solid #e4e2da"></i><!--pnid:Q8mRRNNpdKGYpnCRk3Fn4g-->待点亮</span><span id="pg-tip" style="color:#c9c5bc">· 双指张开放大，捏合恢复</span></div></div>
 <div data-page-node-id="Cfd9SEb079ZWvstR6sEbaQ" class="card-row"><div data-page-node-id="FHwn508jiLWbBnUe8G9gtX" class="card-mini"><div data-page-node-id="5B34zQcZC9KHjXcoViT6a7" class="card-label"><span data-page-node-id="wE5Gjz8pAWwtKzPZrYUrcq" class="tag tag-pink"><!--pnid:hjueJ8TEhCmWiNeG5sKArj-->总存入</span><!--pnid:FDleqnOE14aZOpq8D725d4-->金额</div><div data-page-node-id="fvTlPQr4D4awSasjWxG79f" class="card-big" id="pg-total"><!--pnid:5v5Q0GGyFXXwsXjhLa7y3L-->0.00 元</div><div data-page-node-id="BYCWEXICyV9mZGdjgm08gw" class="card-sub"><!--pnid:5ij3hJVMrrCTLt04nP6o3s-->累计存入金额</div></div><div data-page-node-id="XtWysagyS5j1rOIAJTVavY" class="card-mini"><div data-page-node-id="OXKcPk9HDavF51fm9Q5YUR" class="card-label"><span data-page-node-id="kr41NBRWNqZJTfGMWUge8l" class="tag tag-green"><!--pnid:K3wgmrQ9dG6t0XqMQcIZJq-->已存钱</span><!--pnid:2oxCVPHQ9JJ6B8bklHvjib-->天数</div><div data-page-node-id="911MYiq0IXDJgQEe0ZS9qS" class="card-big" id="pg-days"><!--pnid:P7JNbEq7yEgvZ3MnMamNjW-->0 天</div><div data-page-node-id="YGTvu7JzBYbwHYaO8GVHGr" class="card-sub" id="pg-days-sub"><!--pnid:kJBd5A3nAEnhj616LnIdN0-->尚无存入记录</div></div></div>
 <div data-page-node-id="p4nINgviXViGnWiiKhgkVo" class="section-title"><!--pnid:bYKaZ3cLN4X027dXL5Swvj-->存入记录</div>
 <div data-page-node-id="jpOzfJSEP63shNSqZJbQNN" id="pg-list" style="display:flex; flex-direction:column; width:100%"></div>
@@ -455,7 +462,7 @@ async function manualSync() {
 // ====== 数据体检 / 导出 / 导入（云端不可用时的兜底通道） ======
 function errHint() {
   if (!lastSyncErr) return '云端连接正常';
-  if (lastSyncErr === 'network') return '连不上云端（网络不通或项目已停用）';
+  if (lastSyncErr === 'network') return '连不上云端。最常见原因：Supabase 免费项目长期不活跃被自动暂停，请登录 supabase.com 后台查看并恢复项目';
   if (lastSyncErr === 'HTTP 401' || lastSyncErr === 'HTTP 403') return '云端拒绝访问（Supabase 表权限未开放，需在后台执行授权语句）';
   if (lastSyncErr === 'HTTP 404') return '云端表不存在（app_data 表缺失或字段名不符）';
   if (lastSyncErr === 'HTTP 400') return '云端返回 400（常见于 Supabase 项目被暂停，需到后台恢复项目）';
@@ -471,7 +478,7 @@ function diagModal() {
     + '诊断：' + errHint() + '<br>'
     + '本端记录数：' + n + ' 条<br>'
     + '本端同步基准：' + t(syncMeta.baseAt) + '<br>'
-    + (syncMeta.dirty ? '<span style="color:var(--red)">有未上传的改动，会自动重试</span>' : '本机改动已上传')
+    + (syncMeta.dirty ? '<span style="color:var(--red)">有未上传的改动，会自动重试</span>' : (syncMeta.baseAt ? '本机改动已上传' : '尚未与云端同步过'))
     + '</div>'
     + '<div style="font-size:11px;color:var(--sub);line-height:1.8;margin-top:8px">云端不可用时，可用「导出数据」把本端数据存成文件，在另一台设备用「导入数据」恢复。</div>'
     + '<div class="modal-actions" style="flex-wrap:wrap;gap:8px">'
@@ -735,6 +742,53 @@ async function pgSaveAdd(){
   pgData().records.push({date,amt:num,cell,note});
   await save();closeModal();showToast('已点亮第 '+cell+' 格 · '+pgNumLabel(num)+' 元 ❤');
 }
+/* ====== 多选存入：同时点多个格子，合计后一起存入 ====== */
+let pgSelMode = false, pgSel = new Set();
+function pgSelTotal() { let s = 0; pgSel.forEach(c => { s += pgCellAmt(c); }); return s; }
+function pgSelCells() { return [...pgSel].sort((a, b) => a - b); }
+function pgSelRenderBar() {
+  const bar = document.getElementById('pg-selbar'); if (!bar) return;
+  bar.classList.toggle('show', pgSelMode);
+  const t = document.getElementById('pg-sel-toggle');
+  if (t) { t.textContent = pgSelMode ? '退出' : '多选'; t.style.color = pgSelMode ? '#d4718b' : ''; t.style.borderColor = pgSelMode ? '#ef9ab3' : ''; }
+  const info = document.getElementById('pg-sel-info'), tot = document.getElementById('pg-sel-total');
+  if (info) info.textContent = '已选 ' + pgSel.size + ' 格';
+  if (tot) tot.textContent = fmt(pgSelTotal()) + ' 元';
+}
+function pgToggleSelMode() { pgSelMode = !pgSelMode; if (!pgSelMode) pgSel.clear(); pgSelRenderBar(); renderPlan(); }
+function pgExitSel() { pgSelMode = false; pgSel.clear(); pgSelRenderBar(); renderPlan(); }
+function pgCellClick(i, on) {
+  if (pgJustZoomed()) return;
+  if (pgSelMode) {
+    if (on) { showToast('第 ' + i + ' 格已存入，退出多选可查看'); return; }
+    if (pgSel.has(i)) pgSel.delete(i); else pgSel.add(i);
+    pgSelRenderBar(); renderPlan();
+    return;
+  }
+  pgClickCell(i);
+}
+function pgSelConfirm() {
+  if (!pgSel.size) return showToast('还没有选择格子');
+  const cells = pgSelCells(), total = pgSelTotal();
+  openModal('<div class="modal-title">💗 批量存入 ' + cells.length + ' 格</div>'
+    + '<div style="max-height:32vh;overflow-y:auto;font-size:12px;line-height:1.9;color:var(--sub);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:6px 0;margin-bottom:8px">'
+    + cells.map(c => '第 ' + c + ' 格 · <b style="color:#d4718b">' + pgNumLabel(pgCellAmt(c)) + ' 元</b>').join('<br>')
+    + '</div>'
+    + '<div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px"><span>合计存入</span><span style="color:#d4718b">' + fmt(total) + ' 元</span></div>'
+    + '<div class="form-group"><label class="form-label">日期</label><input type="date" class="form-input" id="pg-sel-date" value="' + ymd() + '"></div>'
+    + '<div class="form-group"><label class="form-label">备注</label><input type="text" class="form-input" id="pg-sel-note" placeholder="可选，如：本周存钱"></div>'
+    + '<div class="modal-actions"><button class="btn-cancel" onclick="closeModal()">取消</button><button class="btn-ok" onclick="pgSelSave()">确认存入</button></div>');
+}
+async function pgSelSave() {
+  const cells = pgSelCells(); if (!cells.length) return;
+  const de = document.getElementById('pg-sel-date'), ne = document.getElementById('pg-sel-note');
+  const date = (de && de.value) || ymd(), note = (ne && ne.value) || '';
+  const total = pgSelTotal();
+  cells.forEach(function (c) { pgData().records.push({ date, amt: pgCellAmt(c), cell: c, note }); });
+  await save();
+  closeModal(); pgExitSel();
+  showToast('已存入 ' + cells.length + ' 格 · 合计 ' + fmt(total) + ' 元 ❤');
+}
 function pgClickCell(i){
   if(pgJustZoomed())return;
   const lit=pgLitSet();
@@ -796,11 +850,12 @@ function renderPlan(){
     for(let s=0;s<PG_COLS;s++){
       if(!slots[s]){html+='<div style="width:var(--pg-cell);height:var(--pg-cell);visibility:hidden"></div>';continue}
       ci++;const num=pgCellAmt(ci);const on=lit.has(ci);
-      html+='<div class="pg-cell'+(on?' on':'')+(justOn.has(ci)?' pop':'')+'" title="第'+ci+'格 · '+pgNumLabel(num)+'元'+(on?'（已点亮）':'')+'" onclick="pgClickCell('+ci+')">'+pgNumLabel(num)+'</div>';
+      const sel=pgSel.has(ci);
+      html+='<div class="pg-cell'+(on?' on':'')+(sel?' sel':'')+(justOn.has(ci)?' pop':'')+'" title="第'+ci+'格 · '+pgNumLabel(num)+'元'+(on?'（已点亮）':'')+'" onclick="pgCellClick('+ci+','+(on?1:0)+')">'+pgNumLabel(num)+'</div>';
     }
     html+='</div>';
   });
-  document.getElementById('pg-heart').innerHTML=html;
+  document.getElementById('pg-heart').innerHTML=html; pgSelRenderBar();
   const total=rec.reduce((s,r)=>s+r.amt,0);
   const days=new Set(rec.map(r=>r.date)).size;
   let first='';
