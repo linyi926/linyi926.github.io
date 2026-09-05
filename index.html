@@ -66,30 +66,41 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 #bk-list,#st-list,#sv-list,#dt-list{display:flex;flex-direction:column;width:100%;max-width:100vw;overflow:hidden}
 #bk-list>*,#st-list>*,#sv-list>*,#dt-list>*{display:flex!important;width:100%!important;max-width:100%!important;flex-shrink:0}
 .record:last-child{border-bottom:none}
-/* ====== 记账 · 双账本（1️⃣ 林意 / 2️⃣ 宝宝贝贝） ====== */
+/* ====== 记账 · 双账本（1️⃣ 林意 / 2️⃣ 宝贝） ====== */
 .bk-merge-card{background:linear-gradient(135deg,#fff5e6,#fff);border:1px solid #fcebd9}
-.bk-merge-sub{font-size:10px;color:var(--sub);margin-top:2px}
-.bk-merge-row{display:flex;justify-content:space-between;margin-top:8px;font-size:12px;color:var(--sub)}
-.bk-merge-row b{color:var(--text);font-size:13px;font-weight:700}
-.bk-merge-pct{text-align:right;font-size:11px;color:var(--accent);margin-top:4px;font-weight:600}
-.bk-merge-split{margin-top:10px;display:flex;flex-direction:column;gap:8px}
-.bk-merge-item{font-size:11px}
-.bk-merge-item .t{display:flex;justify-content:space-between;align-items:center;color:var(--sub);margin-bottom:3px;gap:6px}
-.bk-merge-item .t b{color:var(--text);font-weight:700}
-.bk-split-bar{height:6px;border-radius:3px;background:#f0eee8;overflow:hidden}
+.bk-merge-title{font-size:16px;font-weight:700}
+.bk-merge-sub{font-size:11px;color:var(--sub);margin-top:3px}
+.bk-merge-row{display:flex;justify-content:space-between;margin-top:8px;font-size:13px;color:var(--text)}
+.bk-merge-row b{color:var(--text);font-size:17px;font-weight:700;letter-spacing:-.3px}
+.bk-merge-pct{text-align:right;font-size:12px;color:var(--accent);margin-top:3px;font-weight:600}
+.bk-merge-split{margin-top:8px;display:flex;flex-direction:column;gap:7px}
+.bk-merge-item{font-size:12px}
+.bk-merge-item .t{display:flex;justify-content:space-between;align-items:center;color:#666;margin-bottom:3px;gap:6px;white-space:nowrap}
+.bk-merge-item .t>span{white-space:nowrap;min-width:0}
+.bk-merge-item .t>span:first-child{flex-shrink:0}
+.bk-merge-item .t b{color:var(--text);font-weight:700;font-size:13px}
+.bk-split-bar{height:7px;border-radius:4px;background:#f0eee8;overflow:hidden}
 .bk-split-fill{height:100%;border-radius:3px;transition:width .4s}
+.bk-hist-btn{flex:0 0 auto;padding:5px 14px;font-size:11px;border-radius:15px;box-shadow:var(--shadow)}
 .bk-board{border-radius:16px;padding:10px;margin-bottom:12px;border:1px solid transparent}
 .bk-board-a{background:#fdf1e7;border-color:#f7ddc6}
 .bk-board-b{background:#ecf3fb;border-color:#d5e4f6}
 .bk-board-a .bk-board-title{color:#b9702f}
 .bk-board-b .bk-board-title{color:#4a7cb0}
 .bk-board-b .progress-fill{background:linear-gradient(90deg,#7ba7d9,#5a87b4)}
-.bk-board-head{display:flex;align-items:center;gap:8px;padding:0 2px 8px;margin-bottom:8px;border-bottom:1px dashed rgba(0,0,0,.09)}
+.bk-board-head{display:flex;align-items:center;gap:8px;padding:0 2px 6px;margin-bottom:6px;border-bottom:1px dashed rgba(0,0,0,.09)}
 .bk-board-title{font-size:14px;font-weight:700;letter-spacing:.3px;white-space:nowrap}
 .bk-board-budget{margin-left:auto;font-size:11px;color:var(--sub);white-space:nowrap}
 .bk-board-budget b{font-size:13px;color:var(--text);font-weight:700}
 .bk-board-set{border:1px solid rgba(0,0,0,.1);background:rgba(255,255,255,.9);border-radius:14px;padding:3px 9px;font-size:10px;cursor:pointer;color:#555;font-family:inherit;flex-shrink:0}
 .bk-board .card,.bk-board .card-mini{box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.bk-board .card-mini{padding:8px 10px}
+.bk-board .card-big{font-size:16px}
+.bk-board .card-big.small{font-size:13px}
+.bk-board .card-label{font-size:9px;margin-bottom:2px}
+.bk-board .card-sub{font-size:9px;margin-top:2px}
+.bk-board .card-row{gap:7px;margin-bottom:6px}
+.bk-board .card-row:last-child{margin-bottom:0}
 .bk-board .empty{background:transparent}
 .bk-list{display:flex;flex-direction:column;width:100%;max-width:100vw;overflow:hidden}
 .bk-list>*{display:flex!important;width:100%!important;max-width:100%!important;flex-shrink:0}
@@ -211,10 +222,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 <div data-page-node-id="J8MrDPRbIVRUwhECoWiys8" class="page active" id="page-bookkeeping">
 <div data-page-node-id="oai7NAiCCCoSBdtyCzlrek" class="page-title">你好记账</div>
 <div data-page-node-id="fRZexSlmTLSpcWaB97LWn6" class="page-date" id="bk-date"></div>
-<div data-page-node-id="GdwBP6dGSFPcBjHDLpztdt" class="btn-row"><button class="btn" onclick="bkSetBudget('a')">1️⃣ 林意预算</button><button class="btn" onclick="bkSetBudget('b')">2️⃣ 宝宝贝贝预算</button><button class="btn" onclick="showHistory('bookkeeping')">🔍 查询往月</button></div>
+<div data-page-node-id="GdwBP6dGSFPcBjHDLpztdt" class="btn-row"><button class="btn bk-hist-btn" onclick="showHistory('bookkeeping')">🔍 查询往月</button></div>
 <div class="card bk-merge-card">
-<div style="font-weight:600">📊 本月合并预算使用情况</div>
-<div class="bk-merge-sub" id="bk-merge-sub">林意 + 宝宝贝贝</div>
+<div class="bk-merge-title">📊 本月合并预算使用情况</div>
+<div class="bk-merge-sub" id="bk-merge-sub">林意 + 宝贝</div>
 <div class="progress"><div class="progress-fill" id="bk-merge-progress" style="width:0%"></div></div>
 <div class="bk-merge-row"><span>已花 <b id="bk-merge-spent">0.00</b></span><span>预算 <b id="bk-merge-budget">0.00</b></span><span>剩余 <b id="bk-merge-left">0.00</b></span></div>
 <div class="bk-merge-pct" id="bk-merge-pct">0%</div>
@@ -422,21 +433,22 @@ function normalizeD() {
   if (!D.piggy) D.piggy = { start: 0.2, step: 0.2, records: [] };
   if (!D.debt.log) D.debt.log = [];
 }
-/* 记账双账本：把旧的 { monthlyBudget, expenses } 平滑迁移成 boards[林意/宝宝贝贝] */
+/* 记账双账本：把旧的 { monthlyBudget, expenses } 平滑迁移成 boards[林意/宝贝] */
+let bkRenamed = false; // 旧名自动改名后需要回传云端
 const BK_DEFS = [
   { id: 'a', emoji: '1\ufe0f\u20e3', name: '\u6797\u610f', bar: 'linear-gradient(90deg,#f5a04e,#d88545)' },
-  { id: 'b', emoji: '2\ufe0f\u20e3', name: '\u5b9d\u5b9d\u8d1d\u8d1d', bar: 'linear-gradient(90deg,#7ba7d9,#5a87b4)' }
+  { id: 'b', emoji: '2\ufe0f\u20e3', name: '\u5b9d\u8d1d', bar: 'linear-gradient(90deg,#7ba7d9,#5a87b4)' }
 ];
 function bkNormalize() {
   if (!D.bookkeeping || typeof D.bookkeeping !== 'object') D.bookkeeping = { boards: [] };
   if (!Array.isArray(D.bookkeeping.boards)) D.bookkeeping.boards = [];
   if (D.bookkeeping.boards.length === 0) {
-    // 老数据：整包归到 1️⃣ 林意，2️⃣ 宝宝贝贝 从零开始
+    // 老数据：整包归到 1️⃣ 林意，2️⃣ 宝贝 从零开始
     const lb = D.bookkeeping.monthlyBudget || 500;
     const le = Array.isArray(D.bookkeeping.expenses) ? D.bookkeeping.expenses : [];
     D.bookkeeping.boards = [
       { id: 'a', name: '\u6797\u610f', emoji: '1\ufe0f\u20e3', monthlyBudget: lb, expenses: le },
-      { id: 'b', name: '\u5b9d\u5b9d\u8d1d\u8d1d', emoji: '2\ufe0f\u20e3', monthlyBudget: 0, expenses: [] }
+      { id: 'b', name: '\u5b9d\u8d1d', emoji: '2\ufe0f\u20e3', monthlyBudget: 0, expenses: [] }
     ];
   }
   D.bookkeeping.boards.forEach(function (b) {
@@ -444,6 +456,7 @@ function bkNormalize() {
     if (!b.id) b.id = 'a';
     const def = BK_DEFS.filter(function (x) { return x.id === b.id; })[0] || BK_DEFS[0];
     if (!b.name) b.name = def.name;
+    if (b.name === '\u5b9d\u5b9d\u8d1d\u8d1d') { b.name = def.name; bkRenamed = true; } // 旧名自动改成新名
     if (!b.emoji) b.emoji = def.emoji;
     if (typeof b.monthlyBudget !== 'number') b.monthlyBudget = Number(b.monthlyBudget) || 0;
     if (!Array.isArray(b.expenses)) b.expenses = [];
@@ -480,6 +493,7 @@ async function syncFromCloud(silent) {
       if (!baseAt && hasLocalData()) { backupLocal(); if (!silent) showToast('已备份本机旧数据，改用云端数据'); }
       else if (syncMeta.dirty) { backupLocal(); if (!silent) showToast('云端有更新，本机改动已备份'); }
       D = c.data; normalizeD(); localSave(D);
+      if (bkRenamed) { bkRenamed = false; await pushToCloud(true); } // 云端旧名改新名后立刻回传
       syncMeta.baseAt = c.at; syncMeta.dirty = false; metaSave(syncMeta);
       render();
       if (!silent) showToast('已同步云端最新数据');
@@ -506,6 +520,7 @@ async function initApp() {
   D = localLoad();
   normalizeD();
   render();          // 先用本地缓存秒开
+  if (bkRenamed) { bkRenamed = false; localSave(D); pushToCloud(true); } // 改名等结构修正自动回传云端
   await syncFromCloud(true); // 再与云端比对，云端新则以云端为准
   startAutoSync();
   if (lastSyncErr) showToast('云端同步失败，数据暂存在本机');
@@ -617,7 +632,7 @@ function bkBoardHTML(b){
   const s=b.id;
   const todayRow=s==='a'?(
     '<div class="card-row">'+
-      '<div class="card-mini"><div class="card-label"><span class="tag tag-blue">\u4eca\u65e5</span>\u9884\u7b97</div><div class="card-big" id="bk-today-budget-'+s+'">0\u5143</div><div class="card-sub">\u6708\u9884\u7b97 \u00f7 \u672c\u6708\u5929\u6570</div></div>'+
+      '<div class="card-mini"><div class="card-label"><span class="tag tag-blue">\u4eca\u65e5</span>\u9884\u7b97</div><div class="card-big" id="bk-today-budget-'+s+'">0\u5143</div></div>'+
       '<div class="card-mini"><div class="card-label"><span class="tag tag-pink">\u4eca\u65e5</span>\u5df2\u82b1</div><div class="card-big" id="bk-today-spent-'+s+'">0.00\u5143</div><div class="card-sub" id="bk-today-count-'+s+'">\u5171 0 \u7b14</div></div>'+
     '</div>'):'';
   return '<div class="bk-board bk-board-'+s+'">'+
@@ -629,10 +644,9 @@ function bkBoardHTML(b){
     '</div>'+
     todayRow+
     '<div class="card-row">'+
-      '<div class="card-mini"><div class="card-label"><span class="tag tag-green">\u672c\u6708</span>\u81f3\u4eca\u7ed3\u4f59</div><div class="card-big small" id="bk-balance-'+s+'">0\u5143</div><div class="card-sub" id="bk-over-'+s+'">\u9884\u7b97\u5145\u8db3</div></div>'+
-      '<div class="card-mini"><div class="card-label"><span class="tag tag-orange">\u672c\u6708</span>\u9884\u7b97</div><div class="card-big" id="bk-month-budget-'+s+'">0\u5143</div><div class="card-sub" id="bk-in-days-'+s+'">\u5f53\u6708 0 \u5929\u5728\u9884\u7b97\u5185</div></div>'+
+      '<div class="card-mini"><div class="card-label"><span class="tag tag-green">\u672c\u6708</span>\u81f3\u4eca\u7ed3\u4f59</div><div class="card-big small" id="bk-balance-'+s+'">0\u5143</div></div>'+
+      '<div class="card-mini"><div class="card-label"><span class="tag tag-orange">\u672c\u6708</span>\u9884\u7b97</div><div class="card-big" id="bk-month-budget-'+s+'">0\u5143</div></div>'+
     '</div>'+
-    '<div class="card"><div style="font-weight:600; margin-bottom:10px">\u672c\u6708\u9884\u7b97\u4f7f\u7528\u60c5\u51b5</div><div class="progress"><div class="progress-fill" id="bk-progress-'+s+'" style="width:0%"></div></div><div style="display:flex; justify-content:space-between; margin-top:8px; font-size:12px; color:var(--sub)"><span>\u5df2\u82b1 <b id="bk-month-spent-'+s+'" style="color:var(--text)">0</b> \u5143</span><span>\u5269\u4f59 <b id="bk-month-left-'+s+'" style="color:var(--text)">0</b> \u5143</span></div></div>'+
   '</div>';
 }
 function bkSetTxt(id,v){const el=document.getElementById(id);if(el)el.textContent=v}
@@ -651,20 +665,7 @@ function bkRenderBoard(b){
   bkSetTxt('bk-today-spent-'+s,fmt(todaySpent)+'\u5143');
   bkSetTxt('bk-today-count-'+s,'\u5171 '+todayExp.length+' \u7b14');
   bkSetTxt('bk-balance-'+s,(balance>=0?fmt(balance):'-'+fmt(-balance))+'\u5143');
-  bkSetTxt('bk-over-'+s,balance<0?'\u7d2f\u8ba1\u5df2\u8d85\u652f '+fmt(-balance)+'\u5143':'\u9884\u7b97\u5145\u8db3');
   bkSetTxt('bk-month-budget-'+s,fmt(budget)+'\u5143');
-  let inDays=0;
-  for(let i=1;i<=dayOfMonth;i++){
-    const d=new Date(today.getFullYear(),today.getMonth(),i);
-    const dExp=exp.filter(function(e){return e.date===ymd(d)}).reduce(function(a,e){return a+(Number(e.amt)||0)},0);
-    if(dExp<=dailyBudget)inDays++;
-  }
-  bkSetTxt('bk-in-days-'+s,'\u5f53\u6708 '+inDays+' \u5929\u5728\u9884\u7b97\u5185');
-  const left=budget-monthSpent;
-  const pct=budget>0?Math.min(100,monthSpent/budget*100):0;
-  const pEl=document.getElementById('bk-progress-'+s);if(pEl)pEl.style.width=pct+'%';
-  bkSetTxt('bk-month-spent-'+s,fmt(monthSpent));
-  bkSetTxt('bk-month-left-'+s,fmt(left));
   return {id:s,budget:budget,monthSpent:monthSpent,todaySpent:todaySpent,balance:balance,dailyBudget:dailyBudget,count:monthExp.length};
 }
 /* 第三卡片：两个账本的花费记录合并，按时间倒序（最新在上） */
